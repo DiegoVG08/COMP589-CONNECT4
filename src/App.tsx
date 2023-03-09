@@ -1,15 +1,21 @@
-import './App.css';
-import GameBoard from 'src/components/GameBoard';
 import React from 'react';
+import './App.css';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import NavBar from './components/NavBar';
+import GameBoard from './components/GameBoard';
 
-const App: React.FunctionComponent = ():JSX.Element => {
-
+const App: React.FunctionComponent = (): JSX.Element => {
   return (
-    <div>
-      <h1>Connect Four</h1>
-      <GameBoard/>
-    </div>
+    <Router>
+      <NavBar />
+      <Switch>
+        <Route path="/" exact>
+          <h1>Connect Four</h1>
+          <GameBoard />
+        </Route>
+      </Switch>
+    </Router>
   );
-}
+};
 
 export default App;
