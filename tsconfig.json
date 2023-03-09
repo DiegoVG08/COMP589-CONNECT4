@@ -4,8 +4,10 @@
     ],
     "compilerOptions": {
         "target": "es6",
+        "moduleResolution": "node",
         "jsx": "react",
         "allowSyntheticDefaultImports": true,
         "baseUrl": "."
+        
     }
 }
