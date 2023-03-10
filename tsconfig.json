@@ -1,7 +1,7 @@
 {
     "include": [
         "src/*"
-    ],
+, "src/components/interfaces/AppBar.tsx"    ],
     "compilerOptions": {
         "target": "es6",
         "jsx": "react",
