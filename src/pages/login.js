@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { initializeApp } from "firebase/app";
-import { database } from "../component/Firebase.js";
+import { db } from "../component/Firebase.js";
 import {
   getFirestore,
   collection,
@@ -15,18 +15,17 @@ import {
 } from "firebase/auth";
 import bcrypt from "bcryptjs";
 import { useNavigate } from "react-router-dom";
-import firebase from "firebase/app";
-
 
 import "./style.css";
 
 const Registration = () => {
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const navigate = useNavigate();
 
   const handleRegistration = async (event) => {
     event.preventDefault();
@@ -39,7 +38,7 @@ const Registration = () => {
 
     // Check if email already exists
     const database = getFirestore();
-    const usersRef = collection(database, "users");
+    const usersRef = collection(db, "users");
     const querySnapshot = await getDocs(
       query(usersRef, where("email", "==", email))
     );
@@ -56,12 +55,13 @@ const Registration = () => {
     const auth = getAuth();
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
-      await getFirestore().collection('users').doc(user.uid).set({
+      const userData = {
         username: username,
         email: email,
         uid: user.uid,
         password: hashedPassword,
-      });
+      };
+      await addDoc(usersRef, userData);
 
       // Navigate to login screen after successful registration
       navigate("/Home");
@@ -77,7 +77,6 @@ const Registration = () => {
     setConfirmPassword("");
     setErrorMessage("");
   };
-  
 
   return (
     <div className="form">
