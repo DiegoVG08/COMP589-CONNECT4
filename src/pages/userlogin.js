@@ -5,6 +5,7 @@ import { db } from "../component/Firebase.js";
 import bcrypt from "bcryptjs"; // Import bcrypt library
 import { useNavigate } from "react-router-dom";
 import "./style.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -49,43 +50,25 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="form">
-      <div className="form-body">
-        <div className="email">
-          <label className="form__label" htmlFor="email">
-            Email:
-          </label>
-          <input
-            type="email"
-            id="email"
-            className="form__input"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className="password">
-          <label className="form__label" htmlFor="password">
-            Password:
-          </label>
-          <input
-            className="form__input"
-            type="password"
-            id="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-      </div>
-      <div className="footer">
-        {errorMessage && <p className="error">{errorMessage}</p>}
-        {user && <p>Hello {user.username}</p>}
-        <button type="submit" className="btn" onClick={handleLogin}>
-          {isLoading ? "Loading..." : "Login"}
-        </button>
-      </div>
+    <div class="form">
+  <div class="form-body">
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
     </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" id="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+    </div>
+  </div>
+  <div class="footer">
+    {errorMessage && <p class="error">{errorMessage}</p>}
+    {user && <p>Hello {user.username}</p>}
+    <button type="submit" class="btn btn-primary" onClick={handleLogin}>
+      {isLoading ? "Loading..." : "Login"}
+    </button>
+  </div>
+</div>
   );
 };
 
