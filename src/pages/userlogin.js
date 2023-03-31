@@ -50,7 +50,7 @@ const Login = () => {
   }, []);
 
   return (
-    <div class="form">
+    <div className="form" style={{ backgroundColor: "transparent", border: "2px solid black" }}>
   <div class="form-body">
     <div class="mb-3">
       <label for="email" class="form-label">Email</label>
@@ -64,7 +64,7 @@ const Login = () => {
   <div class="footer">
     {errorMessage && <p class="error">{errorMessage}</p>}
     {user && <p>Hello {user.username}</p>}
-    <button type="submit" class="btn btn-primary" onClick={handleLogin}>
+    <button type="submit" class="btn btn-primary" onClick={handleLogin} style={{ backgroundColor: "gray", border: "2px solid black" }}>
       {isLoading ? "Loading..." : "Login"}
     </button>
   </div>
