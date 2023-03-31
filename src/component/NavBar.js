@@ -10,7 +10,7 @@ const NavBar = () => {
         <Nav className="me-auto">
           <Nav.Link href="/Home">Home</Nav.Link>
           <Nav.Link href="/Account">Account</Nav.Link>
-          <Nav.Link href="/leaderboard">Leader Board</Nav.Link>
+          <Nav.Link href="/leaderboard">LeaderBoard</Nav.Link>
         </Nav>
       </Navbar.Collapse>
     </Navbar>
