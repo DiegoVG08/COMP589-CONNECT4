@@ -2,7 +2,7 @@
 import React from "react";
 import Navbar from './component/NavBar';
 import Login from './pages/login';
-import Home from './pages';
+import Home from './pages/userlogin';
 import  Leaderboard  from "./pages/leaderboard";
 import { BrowserRouter as Router, Routes, Route}
     from 'react-router-dom';
