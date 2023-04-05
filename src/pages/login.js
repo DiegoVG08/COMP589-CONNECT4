@@ -79,8 +79,8 @@ const Registration = () => {
   };
 
   return (
-    <div class="form">
-  <div class="form-body">
+    <div className="form" style={{ backgroundColor: "transparent", border: "2px solid black" }}>
+  <div class="form-body" >
     <div class="form-group">
       <label class="form-label" for="username">Username:</label>
       <input class="form-control" type="text" id="username" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
@@ -100,7 +100,7 @@ const Registration = () => {
   </div>
   <div class="footer">
     {errorMessage && <p class="error">{errorMessage}</p>}
-    <button type="submit" class="btn btn-primary" onClick={handleRegistration}>Register</button>
+    <button type="submit" className="btn btn-primary" onClick={handleRegistration} style={{ backgroundColor: "gray", border: "2px solid black" }}>Register</button>
   </div>
 </div>
 

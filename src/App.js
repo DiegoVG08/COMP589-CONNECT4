@@ -1,22 +1,32 @@
-//import { Leaderboard } from "@mui/icons-material";
-import React from "react";
+import React, { useState } from "react";
 import Navbar from './component/NavBar';
 import Login from './pages/login';
 import Home from './pages/userlogin';
-import  Leaderboard  from "./pages/leaderboard";
-import { BrowserRouter as Router, Routes, Route}
-    from 'react-router-dom';
+import Leaderboard from "./pages/leaderboard";
+import GameBoard from 'src/component/GameBoard';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import './App.css';
 
-//you put the clases here and it will display on the website 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
+
   return (
     <Router>
-    <Navbar />
-    <Routes>
-    <Route path='/Home'  element={<Home />} />
-    <Route path='/Account' element={<Login/>} />
-    <Route path='/leaderboard' element={<Leaderboard/>} />
-    </Routes>
+      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+      <Routes>
+        <Route path='/Home' element={<Home />} />
+        <Route path='/Account' element={<Login handleLogin={handleLogin} />} />
+        <Route path='/leaderboard' element={<Leaderboard />} />
+        <Route path='/Game' element={ <GameBoard />} />
+      </Routes>
     </Router>
   );
 }
