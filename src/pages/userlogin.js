@@ -50,9 +50,10 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="form" style={{ backgroundColor: "transparent", border: "2px solid black" }}>
+    <div className="form" style={{ backgroundColor: "white", border: "2px solid black", alignContent: 'center', padding: '20px', }}>
   <div class="form-body">
     <div class="mb-3">
+      <h3> Login</h3>
       <label for="email" class="form-label">Email</label>
       <input type="email" class="form-control" id="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
     </div>

@@ -79,9 +79,10 @@ const Registration = () => {
   };
 
   return (
-    <div className="form" style={{ backgroundColor: "transparent", border: "2px solid black" }}>
+    <div className="form" style={{ backgroundColor: "white", border: "2px solid black" }}>
   <div class="form-body" >
     <div class="form-group">
+      <h4>Registration</h4>
       <label class="form-label" for="username">Username:</label>
       <input class="form-control" type="text" id="username" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
     </div>
