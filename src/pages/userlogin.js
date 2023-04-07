@@ -3,7 +3,7 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { collection, getDocs, where, query as firestoreQuery } from "firebase/firestore";
 import { db } from "../component/Firebase.js";
 import bcrypt from "bcryptjs"; // Import bcrypt library
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -65,10 +65,13 @@ const Login = () => {
   <div class="footer">
     {errorMessage && <p class="error">{errorMessage}</p>}
     {user && <p>Hello {user.username}</p>}
-    <button type="submit" class="btn btn-primary" onClick={handleLogin} style={{ backgroundColor: "gray", border: "2px solid black" }}>
+    <button type="submit" class="btn btn-primary" onClick={handleLogin} style={{ backgroundColor: "gray", border: "2px solid black", marginLeft: '15px' }}>
       {isLoading ? "Loading..." : "Login"}
     </button>
   </div>
+  <div style={{ marginTop: "20px" }}>
+          <p>Don't have an account? <Link to="/Account" class="btn btn-primary" style={{ backgroundColor: "gray", border: "2px solid black" }}>Register</Link> </p>
+        </div>
 </div>
   );
 };
