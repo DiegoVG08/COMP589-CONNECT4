@@ -17,9 +17,9 @@ const Leaderboard = () => {
       <table className="table table-striped">
         <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col" className="text-end">Score</th>
+            <th scope="col">Rank</th>
+            <th scope="col">Username</th>
+            <th scope="col" className="text-end">Games Won</th>
           </tr>
         </thead>
         <tbody>

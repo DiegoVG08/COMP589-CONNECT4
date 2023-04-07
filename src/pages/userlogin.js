@@ -3,7 +3,7 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { collection, getDocs, where, query as firestoreQuery } from "firebase/firestore";
 import { db } from "../component/Firebase.js";
 import bcrypt from "bcryptjs"; // Import bcrypt library
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -50,9 +50,10 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="form" style={{ backgroundColor: "transparent", border: "2px solid black" }}>
+    <div className="form" style={{ backgroundColor: "white", border: "2px solid black", alignContent: 'center', padding: '20px', }}>
   <div class="form-body">
     <div class="mb-3">
+      <h3> Login</h3>
       <label for="email" class="form-label">Email</label>
       <input type="email" class="form-control" id="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
     </div>
@@ -64,10 +65,13 @@ const Login = () => {
   <div class="footer">
     {errorMessage && <p class="error">{errorMessage}</p>}
     {user && <p>Hello {user.username}</p>}
-    <button type="submit" class="btn btn-primary" onClick={handleLogin} style={{ backgroundColor: "gray", border: "2px solid black" }}>
+    <button type="submit" class="btn btn-primary" onClick={handleLogin} style={{ backgroundColor: "gray", border: "2px solid black", marginLeft: '15px' }}>
       {isLoading ? "Loading..." : "Login"}
     </button>
   </div>
+  <div style={{ marginTop: "20px" }}>
+          <p>Don't have an account? <Link to="/Account" class="btn btn-primary" style={{ backgroundColor: "gray", border: "2px solid black" }}>Register</Link> </p>
+        </div>
 </div>
   );
 };

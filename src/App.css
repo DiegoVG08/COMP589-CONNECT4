@@ -180,8 +180,8 @@ table {
 }
 
 .button {
-  border: 1px solid blue;
-  color: blue;
+  border: 1px solid black;
+  color: black;
   height: 30px;
   width: 100px;
   border-radius: 50px;
@@ -200,7 +200,7 @@ table {
 .tile {
   height: 80px;
   width: 80px;
-  background-color: blue;
+  background-color: black;
   display: flex;
   flex-direction: row;
   justify-content: center;

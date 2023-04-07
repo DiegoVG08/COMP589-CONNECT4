@@ -14,7 +14,7 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import bcrypt from "bcryptjs";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./style.css";
 
@@ -79,9 +79,10 @@ const Registration = () => {
   };
 
   return (
-    <div className="form" style={{ backgroundColor: "transparent", border: "2px solid black" }}>
+    <div className="form" style={{ backgroundColor: "white", border: "2px solid black" }}>
   <div class="form-body" >
     <div class="form-group">
+      <h4>Registration</h4>
       <label class="form-label" for="username">Username:</label>
       <input class="form-control" type="text" id="username" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
     </div>
@@ -100,8 +101,11 @@ const Registration = () => {
   </div>
   <div class="footer">
     {errorMessage && <p class="error">{errorMessage}</p>}
-    <button type="submit" className="btn btn-primary" onClick={handleRegistration} style={{ backgroundColor: "gray", border: "2px solid black" }}>Register</button>
+    <button type="submit" className="btn btn-primary" onClick={handleRegistration} style={{ backgroundColor: "gray", border: "2px solid black", marginLeft: '15px' }}>Register</button>
   </div>
+  <div style={{ marginTop: "20px" }}>
+          <p>Already have an account? <Link to="/Home" class="btn btn-primary" style={{ backgroundColor: "gray", border: "2px solid black" }}>Login</Link> </p>
+        </div>
 </div>
 
   );
