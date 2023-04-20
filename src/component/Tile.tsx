@@ -5,12 +5,14 @@ interface Props {
   columnIndex: number;
   column: Column;
   updateBoard: (columnIndex: number) => void;
+  currentPlayer: number;
 }
 
 const Tile: React.FunctionComponent<Props> = ({
   columnIndex,
   updateBoard,
   column,
+  currentPlayer,
 }: Props): JSX.Element => {
   let tileStatus = "open";
 
@@ -20,10 +22,13 @@ const Tile: React.FunctionComponent<Props> = ({
     tileStatus = "player2";
   }
 
+
+
   return (
     <td>
       <div className="tile" onClick={() => updateBoard(columnIndex)}>
         <div className={[tileStatus, "circle"].join(" ")}></div>
+        
       </div>
     </td>
   );

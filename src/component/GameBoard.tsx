@@ -175,11 +175,14 @@ const GameBoard: React.FunctionComponent = (): JSX.Element => {
         <tbody>
           {board.rows.map(
             (row: Row, i: number): JSX.Element => (
-              <GameRow key={i} row={row} updateBoard={updateBoard} />
+              <GameRow key={i} row={row} updateBoard={updateBoard} currentPlayer={currPlayer} />
             )
           )}
         </tbody>
       </table>
+      <div style={{ textAlign: 'center', padding: '25px' }}>
+        {`Player ${currPlayer}'s Turn`}
+      </div>
     </div>
   );
 };
