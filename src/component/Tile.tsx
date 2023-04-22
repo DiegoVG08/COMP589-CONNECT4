@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { Column } from "src/component/interfaces/Column";
 
 interface Props {
@@ -14,6 +14,7 @@ const Tile: React.FunctionComponent<Props> = ({
   column,
   currentPlayer,
 }: Props): JSX.Element => {
+  const [isHovering, setIsHovering] = useState(false);
   let tileStatus = "open";
 
   if (column.player === 1) {
@@ -26,6 +27,7 @@ const Tile: React.FunctionComponent<Props> = ({
 
   return (
     <td>
+        
       <div className="tile" onClick={() => updateBoard(columnIndex)}>
         <div className={[tileStatus, "circle"].join(" ")}></div>
         

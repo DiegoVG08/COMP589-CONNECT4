@@ -4,15 +4,31 @@ import GameRow from "src/component/GameRow";
 import { Board } from "src/component/interfaces/Board";
 import { Row } from "src/component/interfaces/Row";
 import { Column } from "src/component/interfaces/Column";
+import {Bot} from "src/Bot/Bot";
+import { Button, Form } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const GameBoard: React.FunctionComponent = (): JSX.Element => {
   const initialBoard: Board = {
     rows: Array.from({ length: c4Rows }, (_, i) => ({
       columns: Array.from({ length: c4Columns }, (_, i) => ({ player: null })),
     })),
-  };
+    currPlayer: 1,
+  getEmptyColumns: () => [],
+  clone: () => initialBoard,
+  placeToken: (col: number, player: number) => true,
+  isFull: () => false,
+  hasWinner: () => false,
+  dropDisc: (column: number, player: number) => {},
+  checkForWinner: () => false,
+};
+  
   const [board, setBoard] = useState<Board>(initialBoard);
   const [currPlayer, setCurrPlayer] = useState<number>(1);
+  const [botPlaying, setBotPlaying] = useState(false);
+  const [botDifficulty, setBotDifficulty] = useState<"easy" | "hard">("easy");
+
 
   const updateBoard = (columnIndex: number): void => {
     let boardCopy: Board = board;
@@ -160,16 +176,95 @@ const GameBoard: React.FunctionComponent = (): JSX.Element => {
     }
     return false;
   };
+  function handleColumnSelect(
+    columnIndex: number,
+  ) {
+    // Update the board state with the selected column index
+    const updatedBoard = board.clone();
+    updatedBoard.dropDisc(columnIndex, currPlayer);
+    setBoard(updatedBoard);
+  
+    const table = document.querySelector("#my-table") as HTMLTableElement | null;
+  
+    // Hide all columns except for the selected one
+    if (table) {
+      for (let i = 0; i < table.rows.length; i++) {
+        const row = table.rows[i];
+        for (let j = 0; j < row.cells.length; j++) {
+          const cell = row.cells[j];
+          if (j === columnIndex) {
+            cell.style.display = "";
+          } else {
+            cell.style.display = "none";
+          }
+        }
+      }
+    }
+  }
+
+  // Get all the columns on the board
+// Get all elements with the class "tile"
+const tiles = document.querySelectorAll('.tile');
+
+// Add a mouseover and mouseout event listener to each column within each tile
+tiles.forEach(tile => {
+  const columns = tile.querySelectorAll('.column');
+
+  columns.forEach(column => {
+    column.addEventListener('mouseover', () => {
+      // Create a new div element to represent the shadow of the coin
+      const shadow = document.createElement('div');
+      shadow.classList.add('coin-shadow');
+
+      // Position the shadow element underneath the column
+      const columnRect = column.getBoundingClientRect();
+      shadow.style.left = `${columnRect.left}px`;
+      shadow.style.top = `${columnRect.bottom}px`;
+
+      // Add the shadow element to the board
+      tile.appendChild(shadow);
+    });
+
+    column.addEventListener('mouseout', () => {
+      // Remove the shadow element from the board
+      const shadow = tile.querySelector('.coin-shadow');
+      if (shadow) {
+        shadow.remove();
+      }
+    });
+  });
+});
+
   return (
     <div>
       <div
         className="button"
         onClick={() => {
           setBoard(initialBoard);
-        }}
-      >
+        }}>
         New Game
       </div>
+      <div>
+
+    <Button onClick={() => setBotPlaying(true)}>Start Bot</Button>
+  <label htmlFor="difficulty">Bot Difficulty:</label>
+  <select
+    id="difficulty"
+    value={botDifficulty}
+    onChange={(event) =>
+      setBotDifficulty(event.target.value as "easy" | "hard")
+    }>
+    <option value="easy">Easy</option>
+    <option value="hard">Hard</option>
+  </select>
+  {botPlaying && (
+  <Bot
+    board={board}
+    onColumnSelect={handleColumnSelect}
+    difficulty={botDifficulty}
+  />
+)}
+</div>
       <table>
         <thead></thead>
         <tbody>
@@ -180,7 +275,7 @@ const GameBoard: React.FunctionComponent = (): JSX.Element => {
           )}
         </tbody>
       </table>
-      <div style={{ textAlign: 'center', padding: '25px' }}>
+      <div style={{ textAlign: 'center', padding: '25px', fontSize: '24px' }}>
         {`Player ${currPlayer}'s Turn`}
       </div>
     </div>
