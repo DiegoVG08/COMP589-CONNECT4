@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Column } from "src/component/interfaces/Column";
-import '../App.css';
 
 interface Props {
   columnIndex: number;
@@ -21,14 +20,11 @@ const Tile: React.FunctionComponent<Props> = ({
 }: Props): JSX.Element => {
   const [isHovering, setIsHovering] = useState(false);
   let tileStatus = "open";
-  let coinShadowClass = "";
 
   if (column.player === 1) {
     tileStatus = "player1";
-    coinShadowClass = "coin-shadow-red";
   } else if (column.player === 2) {
     tileStatus = "player2";
-    coinShadowClass = "coin-shadow-yellow";
   }
 
   const handleMouseEnter = () => {
@@ -59,7 +55,9 @@ const Tile: React.FunctionComponent<Props> = ({
         onMouseLeave={handleMouseLeave}
       >
         {hoverTile === getBottomEmptyTileIndex() && isHovering && (
-          <div className={`coin-shadow ${coinShadowClass}`} />
+          <div
+          className={`coin-shadow${currentPlayer === 2 ? ' player2-shadow' : ''}`}
+        />
         )}
         <div className={[tileStatus, "circle"].join(" ")}></div>
       </div>

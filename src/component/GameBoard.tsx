@@ -223,24 +223,40 @@ tiles.forEach(tile => {
       const shadow = document.createElement('div');
       shadow.classList.add('coin-shadow');
 
+      // Add the class 'player2-shadow' to the shadow element if the current player is 2
+      if (currPlayer === 2) {
+        shadow.classList.add('player2-shadow');
+      }
+
+      // Set the data-player attribute on the parent .tile element
+      const tile = column.closest('.tile');
+      if (tile) {
+        tile.setAttribute('data-player', currPlayer.toString());
+      }
+
       // Position the shadow element underneath the column
       const columnRect = column.getBoundingClientRect();
       shadow.style.left = `${columnRect.left}px`;
       shadow.style.top = `${columnRect.bottom}px`;
 
       // Add the shadow element to the board
-      tile.appendChild(shadow);
+      tile?.appendChild(shadow);
     });
 
     column.addEventListener('mouseout', () => {
-      // Remove the shadow element from the board
-      const shadow = tile.querySelector('.coin-shadow');
-      if (shadow) {
-        shadow.remove();
+      // Remove the shadow element and data-player attribute from the board
+      const tile = column.closest('.tile');
+      if (tile) {
+        tile.removeAttribute('data-player');
+        const shadow = tile.querySelector('.coin-shadow');
+        if (shadow) {
+          shadow.remove();
+        }
       }
     });
   });
 });
+
 
   return (
     <div>

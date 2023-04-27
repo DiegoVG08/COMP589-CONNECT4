@@ -231,14 +231,19 @@ table {
 
 .coin-shadow {
   position: absolute; /* Position the element absolutely within the .tile element */
-  bottom: px; /* Position the element at the bottom of the .tile element */
+   /* Position the element at the bottom of the .tile element */
   border-radius: 100px;
   height: 65px;
   width: 65px;
   background-color: rgba(255, 0, 0, 0.5); /* Set the default color to semi-transparent red */
 }
 
-.player2 .coin-shadow {
+.player2-shadow {
+  position: absolute; /* Position the element absolutely within the .tile element */
+   /* Position the element at the bottom of the .tile element */
+  border-radius: 100px;
+  height: 65px;
+  width: 65px;
   background-color: rgba(255, 255, 0, 0.5); /* semi-transparent yellow for player 2 */
 }
 
