@@ -1,4 +1,5 @@
 import { Row } from "src/component/interfaces/Row";
+import { Column } from "src/component/interfaces/Column";
 
 export interface Board {
   rows: Row[];

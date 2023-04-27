@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { c4Columns, c4Rows } from "src/component/constants/index";
 import GameRow from "src/component/GameRow";
 import { Board } from "src/component/interfaces/Board";
@@ -7,27 +6,35 @@ import { Column } from "src/component/interfaces/Column";
 import {Bot} from "src/Bot/Bot";
 import { Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState, Dispatch, SetStateAction } from "react";
+
 
 
 const GameBoard: React.FunctionComponent = (): JSX.Element => {
   const initialBoard: Board = {
     rows: Array.from({ length: c4Rows }, (_, i) => ({
-      columns: Array.from({ length: c4Columns }, (_, i) => ({ player: null })),
+      columns: Array.from({ length: c4Columns }, (_, i) => ({
+        player: null,
+        tiles: []
+      })),
+      tiles: Array.from({ length: c4Columns }, (_, i) => i),
     })),
     currPlayer: 1,
-  getEmptyColumns: () => [],
-  clone: () => initialBoard,
-  placeToken: (col: number, player: number) => true,
-  isFull: () => false,
-  hasWinner: () => false,
-  dropDisc: (column: number, player: number) => {},
-  checkForWinner: () => false,
-};
+    getEmptyColumns: () => [],
+    clone: () => initialBoard,
+    placeToken: (col: number, player: number) => true,
+    isFull: () => false,
+    hasWinner: () => false,
+    dropDisc: (column: number, player: number) => {},
+    checkForWinner: () => false,
+  };
   
   const [board, setBoard] = useState<Board>(initialBoard);
   const [currPlayer, setCurrPlayer] = useState<number>(1);
   const [botPlaying, setBotPlaying] = useState(false);
   const [botDifficulty, setBotDifficulty] = useState<"easy" | "hard">("easy");
+  const [hoverTile, setHoverTile] = useState<number | null>(null);
+
 
 
   const updateBoard = (columnIndex: number): void => {
@@ -267,13 +274,18 @@ tiles.forEach(tile => {
 </div>
       <table>
         <thead></thead>
-        <tbody>
-          {board.rows.map(
-            (row: Row, i: number): JSX.Element => (
-              <GameRow key={i} row={row} updateBoard={updateBoard} currentPlayer={currPlayer} />
-            )
-          )}
-        </tbody>
+       <tbody>
+  {board.rows.map((row: Row, i: number): JSX.Element => (
+    <GameRow
+      key={i}
+      row={row}
+      updateBoard={updateBoard}
+      currentPlayer={currPlayer}
+      hoverTile={hoverTile}
+      setHoverTile={setHoverTile}
+    />
+  ))}
+</tbody>
       </table>
       <div style={{ textAlign: 'center', padding: '25px', fontSize: '24px' }}>
         {`Player ${currPlayer}'s Turn`}
