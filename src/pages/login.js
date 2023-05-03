@@ -17,6 +17,7 @@ import bcrypt from "bcryptjs";
 import { useNavigate, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./style.css";
+import login_text from "./login_text.js";
 
 const Registration = () => {
   const navigate = useNavigate();
@@ -64,7 +65,7 @@ const Registration = () => {
       await addDoc(usersRef, userData);
 
       // Navigate to login screen after successful registration
-      navigate("/Home");
+      navigate("/Game");
     } catch (error) {
       setErrorMessage(error.message);
       return;
@@ -79,35 +80,7 @@ const Registration = () => {
   };
 
   return (
-    <div className="form" style={{ backgroundColor: "white", border: "2px solid black" }}>
-  <div class="form-body" >
-    <div class="form-group">
-      <h4>Registration</h4>
-      <label class="form-label" for="username">Username:</label>
-      <input class="form-control" type="text" id="username" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="email">Email:</label>
-      <input type="email" id="email" class="form-control" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="password">Password:</label>
-      <input class="form-control" type="password" id="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="confirmPassword">Confirm Password:</label>
-      <input class="form-control" type="password" id="confirmPassword" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-    </div>
-  </div>
-  <div class="footer">
-    {errorMessage && <p class="error">{errorMessage}</p>}
-    <button type="submit" className="btn btn-primary" onClick={handleRegistration} style={{ backgroundColor: "gray", border: "2px solid black", marginLeft: '15px' }}>Register</button>
-  </div>
-  <div style={{ marginTop: "20px" }}>
-          <p>Already have an account? <Link to="/Home" class="btn btn-primary" style={{ backgroundColor: "gray", border: "2px solid black" }}>Login</Link> </p>
-        </div>
-</div>
-
+    login_text
   );
 };
 

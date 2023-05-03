@@ -38,7 +38,7 @@ const Login = () => {
       await signInWithEmailAndPassword(auth, email, password);
       setIsLoading(false);
       setUser(user);
-      navigate("/Home");
+      navigate("/Game");
     } catch (error) {
       setErrorMessage(error.message);
       setIsLoading(false);
@@ -54,23 +54,23 @@ const Login = () => {
   <div class="form-body">
     <div class="mb-3">
       <h3> Login</h3>
-      <label for="email" class="form-label">Email</label>
+      <label for="email" class="form-label">Email: </label>
       <input type="email" class="form-control" id="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
     </div>
     <div class="mb-3">
-      <label for="password" class="form-label">Password</label>
+      <label for="password" class="form-label">Password: </label>
       <input type="password" class="form-control" id="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
     </div>
   </div>
   <div class="footer">
-    {errorMessage && <p class="error">{errorMessage}</p>}
-    {user && <p>Hello {user.username}</p>}
-    <button type="submit" class="btn btn-primary" onClick={handleLogin} style={{ backgroundColor: "gray", border: "2px solid black", marginLeft: '15px' }}>
+    <button type="submit" class="btn btn-primary" onClick={handleLogin} style={{ backgroundColor: "gray", border: "2px solid black", marginLeft: '5px' }}>
       {isLoading ? "Loading..." : "Login"}
     </button>
   </div>
-  <div style={{ marginTop: "20px" }}>
-          <p>Don't have an account? <Link to="/Account" class="btn btn-primary" style={{ backgroundColor: "gray", border: "2px solid black" }}>Register</Link> </p>
+  {errorMessage && <p class="error">{errorMessage}</p>}
+  <div style={{ marginTop: "5px" }}>
+          <Link to="/Account" class="btn btn-primary" style={{ backgroundColor: "gray", border: "2px solid black" }}> 
+          Don't have an account?</Link> 
         </div>
 </div>
   );
