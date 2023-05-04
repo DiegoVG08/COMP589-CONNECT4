@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getAuth, updateProfile } from 'firebase/auth';
+
 import { getFirestore, doc, updateDoc, getDoc } from 'firebase/firestore';
 import './style.css';
 
@@ -14,10 +15,10 @@ function AccountPage() {
     const auth = getAuth();
     const currentUser = auth.currentUser;
     if (currentUser) {
-        console.log(currentUser);
+      console.log(currentUser);
       setUser(currentUser);
-      setDisplayUser(currentUser.displayName);
       setEmail(currentUser.email);
+      setDisplayUser(currentUser.username);
       console.log(currentUser.email)
       const db = getFirestore();
       const userDoc = doc(db, 'users', currentUser.uid);
@@ -34,6 +35,8 @@ function AccountPage() {
       });
     }
   }, []);
+  
+  
 
   const handleDisplayNameChange = (e) => {
     setDisplayUser(e.target.value);
