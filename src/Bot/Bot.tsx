@@ -7,7 +7,6 @@ interface BotProps {
   difficulty: "easy" | "hard";
 }
 
-
 export const Bot: React.FC<BotProps> = ({
   board,
   onColumnSelect,
@@ -52,24 +51,27 @@ export const Bot: React.FC<BotProps> = ({
   const getScoreForColumn = (board: Board, columnIndex: number): number => {
     const nextBoard = board.clone();
     nextBoard.dropDisc(columnIndex, board.currPlayer);
-
+  
     if (nextBoard.checkForWinner()) {
       return 1;
     }
-    
+  
     if (nextBoard.checkForWinner() === false) {
       return -1;
     }
-    
-
+  
     let totalScore = 0;
     const emptyColumns = nextBoard.getEmptyColumns();
-
+  
+    if (emptyColumns.length === 0) {
+      return 0;
+    }
+  
     emptyColumns.forEach((column) => {
       const score = getScoreForColumn(nextBoard, column);
       totalScore += score;
     });
-
+  
     return totalScore / emptyColumns.length;
   };
 

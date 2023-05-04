@@ -70,7 +70,7 @@ const Login = () => {
     </button>
   </div>
   <div style={{ marginTop: "20px" }}>
-          <p>Don't have an account? <Link to="/Account" class="btn btn-primary" style={{ backgroundColor: "gray", border: "2px solid black" }}>Register</Link> </p>
+          <p>Don't have an account? <Link to="/Register" class="btn btn-primary" style={{ backgroundColor: "gray", border: "2px solid black" }}>Register</Link> </p>
         </div>
 </div>
   );
