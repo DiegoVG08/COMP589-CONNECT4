@@ -8,9 +8,20 @@ import { Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, Dispatch, SetStateAction } from "react";
 
-
-
 const GameBoard: React.FunctionComponent = (): JSX.Element => {
+  const getEmptyColumns = (): number[] => {
+    const emptyColumns: number[] = [];
+  
+    for (let colIndex = 0; colIndex < c4Columns; colIndex++) {
+      const topTile = board.rows[0].columns[colIndex].tiles[0];
+      if (topTile === null) {
+        emptyColumns.push(colIndex);
+      }
+    }
+  
+    return emptyColumns;
+  };
+
   const initialBoard: Board = {
     rows: Array.from({ length: c4Rows }, (_, i) => ({
       columns: Array.from({ length: c4Columns }, (_, i) => ({
@@ -34,6 +45,7 @@ const GameBoard: React.FunctionComponent = (): JSX.Element => {
   const [botPlaying, setBotPlaying] = useState(false);
   const [botDifficulty, setBotDifficulty] = useState<"easy" | "hard">("easy");
   const [hoverTile, setHoverTile] = useState<number | null>(null);
+  const [thinking, setThinking] = useState(false);
 
 
 

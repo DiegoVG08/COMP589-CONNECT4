@@ -15,6 +15,7 @@ export const Bot: React.FC<BotProps> = ({
   const [thinking, setThinking] = useState(false);
 
   useEffect(() => {
+    
     if (thinking) {
       const botMove = difficulty === "easy" ? easyBotMove : hardBotMove;
       const columnIndex = botMove(board);
@@ -26,6 +27,7 @@ export const Bot: React.FC<BotProps> = ({
   }, [board, onColumnSelect, difficulty, thinking]);
 
   const easyBotMove = (board: Board): number => {
+    
     const emptyColumns = board.getEmptyColumns();
     return emptyColumns[Math.floor(Math.random() * emptyColumns.length)];
   };
