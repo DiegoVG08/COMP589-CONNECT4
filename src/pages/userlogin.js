@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { collection, getDocs, where, query as firestoreQuery } from "firebase/firestore";
 import { db } from "../component/Firebase.js";
 import bcrypt from "bcryptjs"; // Import bcrypt library
@@ -15,6 +15,8 @@ const Login = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
+  const auth = getAuth();
+
   const getUserByEmail = async (email) => {
     const usersRef = collection(db, "users");
     const q = firestoreQuery(usersRef, where("email", "==", email));
@@ -28,7 +30,6 @@ const Login = () => {
   const handleLogin = async (event) => {
     event.preventDefault();
     setIsLoading(true);
-    const auth = getAuth();
     try {
       const user = await getUserByEmail(email);
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
@@ -44,6 +45,42 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in
+        const uid = user.uid;
+        const usersRef = collection(db, "users");
+        const q = firestoreQuery(usersRef, where("uid", "==", uid));
+        getDocs(q)
+          .then((querySnapshot) => {
+            if (!querySnapshot.empty) {
+              const userData = querySnapshot.docs[0].data();
+              setUser(userData);
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      } else {
+        // User is signed out
+        setUser(null);
+      }
+    });
+
+    return unsubscribe;
+  }, [auth]);
 
   useEffect(() => {
     setIsLoading(false);

@@ -75,7 +75,7 @@ function AccountPage() {
           <div className="form-body">
             <div className="form-group mb-3">
               <label htmlFor="email" className="form-label">Email address</label>
-              <input type="email" className="form-control" id="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!isUpdating} />
+              <input type="email" className="form-control" id="email" placeholder="Email" value={user?.email} onChange={handleEmailChange} disabled={!isUpdating} />
             </div>
             <div className="form-group mb-3">
               <label htmlFor="username" className="form-label">Username</label>
