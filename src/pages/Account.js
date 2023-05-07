@@ -67,84 +67,57 @@ function AccountPage() {
 
   return (
     <div className="container mt-5">
-      <div className="row">
+    <div className="row">
+     
+        <div className="form" style={{ backgroundColor: "white", border: "2px solid black", alignContent: 'center', }}>
         <div className="col-md-8">
-          <h3>Account Information</h3>
-          <form>
-          <div className="form-group">
-  <label htmlFor="username">Username</label> 
-  <input
-  type="text"
-  className="form-control"
-  id="username"
-  value={displayUser}
-  onChange={handleDisplayNameChange}
-  disabled={!isUpdating}
-/>
-</div>
-            <div className="form-group">
-              <label htmlFor="email">Email address</label>
-              <input
-                type="email"
-                className="form-control"
-                id="email"
-                value={email}
-                onChange={handleEmailChange}
-                disabled={!isUpdating}
-              />
+        <h3>Account Information</h3>
+          <div className="form-body">
+            <div className="form-group mb-3">
+              <label htmlFor="email" className="form-label">Email address</label>
+              <input type="email" className="form-control" id="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!isUpdating} />
             </div>
-          </form>
-          <div className="form-group">
-            <label htmlFor="totalWins">Total Wins</label>
-            <input
-              type="number"
-              className="form-control"
-              id="totalWins"
-              value={totalWins}
-              readOnly
-            />
+            <div className="form-group mb-3">
+              <label htmlFor="username" className="form-label">Username</label>
+              <input type="text" className="form-control" id="username" placeholder="Username" value={displayUser} onChange={handleDisplayNameChange} disabled={!isUpdating} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="totalWins">Total Wins</label>
+              <input type="number" className="form-control" id="totalWins" value={totalWins} readOnly />
+            </div>
+            <div className="form-group mt-3">
+              {!isUpdating && (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => setIsUpdating(true)}
+                  style={{ backgroundColor: "gray", border: "2px solid black"}}
+                >
+                  Update Profile
+                </button>
+              )}
+              {isUpdating && (
+                <>
+                  <button type="button" className="btn btn-success mx-2" onClick={handleUpdateProfile}>
+                    Save Changes
+                  </button>
+                  <button type="button" className="btn btn-danger" onClick={() => {
+                      setIsUpdating(false);
+                      setDisplayUser(user.displayName);
+                      setEmail(user.email);
+                    }}>
+                    Cancel
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
-      <div className="row mt-3">
-        <div className="col-md-8">
-          {!isUpdating && (
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => setIsUpdating(true)}
-            >
-              Update Profile
-            </button>
-          )}
-          {isUpdating && (
-            <button
-              type="button"
-              className="btn btn-success"
-              onClick={handleUpdateProfile}
-            >
-              Save Changes
-            </button>
-            
-          )}
-          {isUpdating && (
-  <button
-    type="button"
-    className="btn btn-danger ml-2"
-    onClick={() => {
-      setIsUpdating(false);
-      setDisplayUser(user.displayName);
-      setEmail(user.email);
-    }}
-  >
-    Cancel
-  </button>
-)}
-
-        </div>
-        </div>
-        </div>
-    );
+    </div>
+  </div>
+  );
+  
 }
 
 export default AccountPage;
