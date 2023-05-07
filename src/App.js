@@ -22,8 +22,7 @@ function App() {
 
   return (
     <Router>
-    
-      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} user ={user}/>
+      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} user={user}/>
       <Routes>
         <Route path='/Home' element={<Home />} />
         <Route path='/Register' element={<Login handleLogin={handleLogin} />} />

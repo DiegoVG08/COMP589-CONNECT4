@@ -39,7 +39,7 @@ const Login = () => {
       await signInWithEmailAndPassword(auth, email, password);
       setIsLoading(false);
       setUser(user);
-      navigate("/Home");
+      navigate("/Account");
     } catch (error) {
       setErrorMessage(error.message);
       setIsLoading(false);

@@ -1,19 +1,11 @@
 import React from "react";
 import { Navbar, Nav } from "react-bootstrap";
 
-const NavBar = ({ user, handleLogout }) => {
+const NavBar = (props) => {
+  const { user, handleLogout } = props;
   return (
-    <Navbar
-      style={{ color: "white", borderBottom: "px solid #ccc" }}
-      variant="dark"
-      expand="lg"
-      user={user}
-    >
-      <Navbar.Brand
-        href="#"
-        className="pl-3"
-        style={{ font: "Roboto", fontSize: 21 }}
-      >
+    <Navbar style={{ color: "white", borderBottom: "2.5px solid #ccc" }} variant="dark" expand="lg" user={user}>
+      <Navbar.Brand href="#" className="pl-3" style={{ font: "Roboto", fontSize: 21 }}>
         <strong> Connect4 </strong>
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -35,9 +27,7 @@ const NavBar = ({ user, handleLogout }) => {
         {user && user.username && (
           <Nav.Link>
             <p>Hello, {user.username}!</p>
-            <Nav.Link onClick={handleLogout} className="nav-link">
-              Logout
-            </Nav.Link>
+            <button onClick={handleLogout}>Logout</button>
           </Nav.Link>
         )}
       </Navbar.Collapse>
