@@ -104,7 +104,7 @@ const Registration = () => {
     <button type="submit" className="btn btn-primary" onClick={handleRegistration} style={{ backgroundColor: "gray", border: "2px solid black", marginLeft: '15px' }}>Register</button>
   </div>
   <div style={{ marginTop: "20px" }}>
-          <p>Already have an account? <Link to="/" class="btn btn-primary" style={{ backgroundColor: "gray", border: "2px solid black" }}>Login</Link> </p>
+          <p>Already have an account? <Link to="/Home" class="btn btn-primary" style={{ backgroundColor: "gray", border: "2px solid black" }}>Login</Link> </p>
         </div>
 </div>
 

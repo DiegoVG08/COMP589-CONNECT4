@@ -22,6 +22,7 @@ function App() {
 
   return (
     <Router>
+      <Navigate to='/Home' />
       <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
       <Routes>
         <Route path='/Home' element={<Home />} />
