@@ -4,9 +4,10 @@ import { Board } from "src/component/interfaces/Board";
 import { Row } from "src/component/interfaces/Row";
 import { Column } from "src/component/interfaces/Column";
 import {Bot} from "src/Bot/Bot";
-import { Button, Form } from 'react-bootstrap';
+import { Button, Form, Modal } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, Dispatch, SetStateAction } from "react";
+
 
 const GameBoard: React.FunctionComponent = (): JSX.Element => {
   const getEmptyColumns = (): number[] => {
@@ -21,6 +22,8 @@ const GameBoard: React.FunctionComponent = (): JSX.Element => {
   
     return emptyColumns;
   };
+
+
 
   const initialBoard: Board = {
     rows: Array.from({ length: c4Rows }, (_, i) => ({
@@ -46,6 +49,7 @@ const GameBoard: React.FunctionComponent = (): JSX.Element => {
   const [botDifficulty, setBotDifficulty] = useState<"easy" | "hard">("easy");
   const [hoverTile, setHoverTile] = useState<number | null>(null);
   const [thinking, setThinking] = useState(false);
+  
 
 
 
@@ -221,6 +225,7 @@ const GameBoard: React.FunctionComponent = (): JSX.Element => {
     }
   }
 
+
   // Get all the columns on the board
 // Get all elements with the class "tile"
 const tiles = document.querySelectorAll('.tile');
@@ -268,6 +273,7 @@ tiles.forEach(tile => {
     });
   });
 });
+
 
 
   return (
@@ -319,6 +325,9 @@ tiles.forEach(tile => {
         {`Player ${currPlayer}'s Turn`}
       </div>
     </div>
+
+    
+
   );
 };
 

@@ -15,6 +15,7 @@
     "bcrypt": "^5.1.0",
     "bcryptjs": "^2.4.3",
     "bootstrap": "^5.2.3",
+    "escomplex": "^2.0.0-alpha",
     "firebase": "^9.18.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",
