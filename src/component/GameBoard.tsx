@@ -6,35 +6,32 @@ import { Column } from "src/component/interfaces/Column";
 import {Bot} from "src/Bot/Bot";
 import { Button, Form, Modal } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React, { useState, Dispatch, SetStateAction } from "react";
+import React, { useState, Dispatch, SetStateAction, useCallback } from "react";
 
 
 const GameBoard: React.FunctionComponent = (): JSX.Element => {
+  const isColumnFull = (columnIndex: number): boolean => {
+    const topTile = board.rows[0].columns[columnIndex].tiles[0];
+    return topTile !== null;
+  };
+
   const getEmptyColumns = (): number[] => {
-    const emptyColumns: number[] = [];
-  
-    for (let colIndex = 0; colIndex < c4Columns; colIndex++) {
-      const topTile = board.rows[0].columns[colIndex].tiles[0];
-      if (topTile === null) {
-        emptyColumns.push(colIndex);
-      }
-    }
-  
+    const emptyColumns = Array.from({ length: c4Columns }, (_, i) => i).filter(
+      (colIndex) => !isColumnFull(colIndex)
+    );
     return emptyColumns;
   };
 
-
-
   const initialBoard: Board = {
     rows: Array.from({ length: c4Rows }, (_, i) => ({
-      columns: Array.from({ length: c4Columns }, (_, i) => ({
+      columns: Array.from({ length: c4Columns }, (_, j) => ({
         player: null,
-        tiles: []
+        tiles: [],
       })),
-      tiles: Array.from({ length: c4Columns }, (_, i) => i),
+      tiles: Array.from({ length: c4Columns }, (_, j) => j),
     })),
     currPlayer: 1,
-    getEmptyColumns: () => [],
+    getEmptyColumns,
     clone: () => initialBoard,
     placeToken: (col: number, player: number) => true,
     isFull: () => false,
@@ -42,46 +39,42 @@ const GameBoard: React.FunctionComponent = (): JSX.Element => {
     dropDisc: (column: number, player: number) => {},
     checkForWinner: () => false,
   };
-  
+
   const [board, setBoard] = useState<Board>(initialBoard);
-  const [currPlayer, setCurrPlayer] = useState<number>(1);
+  const [currPlayer, setCurrPlayer] = useState(1);
   const [botPlaying, setBotPlaying] = useState(false);
   const [botDifficulty, setBotDifficulty] = useState<"easy" | "hard">("easy");
   const [hoverTile, setHoverTile] = useState<number | null>(null);
   const [thinking, setThinking] = useState(false);
   
-
-
-
-  const updateBoard = (columnIndex: number): void => {
-    let boardCopy: Board = board;
-    let rowIndex: number = 0;
-    let areColumnsFull = true;
-    for (let r: number = 5; r >= 0; r--) {
-      let columnPlayer = boardCopy.rows[r].columns[columnIndex].player;
-      if (!columnPlayer) {
-        boardCopy.rows[r].columns[columnIndex].player = currPlayer;
-        rowIndex = r;
-        areColumnsFull = false;
-        break;
+  const updateBoard = useCallback((columnIndex: number): void => {
+    setBoard(prevBoard => {
+      const boardCopy = {...prevBoard};
+      let rowIndex: number = 0;
+      let areColumnsFull = true;
+      for (let r: number = 5; r >= 0; r--) {
+        let columnPlayer = boardCopy.rows[r].columns[columnIndex].player;
+        if (!columnPlayer) {
+          boardCopy.rows[r].columns[columnIndex].player = currPlayer;
+          rowIndex = r;
+          areColumnsFull = false;
+          break;
+        }
       }
-    }
-    if (!areColumnsFull) {
-      setBoard(boardCopy);
-      setCurrPlayer(currPlayer === 1 ? 2 : 1);
-    }
-    if (winCheck(rowIndex, columnIndex)) {
-      setBoard(initialBoard);
-      alert("player " + currPlayer + " wins");
-      setCurrPlayer(1);
-    } else {
-      if (drawCheck()) {
-        setBoard(initialBoard);
+      if (!areColumnsFull) {
+        setCurrPlayer(currPlayer => currPlayer === 1 ? 2 : 1);
+      }
+      if (winCheck(rowIndex, columnIndex)) {
+        alert("player " + currPlayer + " wins");
+        return initialBoard;
+      } else if (drawCheck()) {
         alert("Draw");
-        setCurrPlayer(1);
+        return initialBoard;
       }
-    }
-  };
+      return boardCopy;
+    });
+  }, [currPlayer]);
+  
   const drawCheck = (): boolean => {
     let isBoardFilled: boolean =
       board.rows.filter(

@@ -7,14 +7,10 @@ import AccountPage from "./pages/Account";
 import GameBoard from 'src/component/GameBoard';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
-import escomplex from "escomplex";
-
-
 
 
 function App() {
-  const result = escomplex.analyse(source, options);
-  console.log(result);
+ 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState({}); // Define user state variable
   console.log(user);

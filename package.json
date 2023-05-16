@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "connect4",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -16,13 +16,16 @@
     "bcryptjs": "^2.4.3",
     "bootstrap": "^5.2.3",
     "escomplex": "^2.0.0-alpha",
+    "express": "^4.18.2",
     "firebase": "^9.18.0",
+    "firebase-admin": "^11.8.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
     "react-router-dom": "^6.10.0",
     "react-scripts": "5.0.1",
+    "socket.io-client": "^4.6.1",
     "styled-components": "^5.3.8",
     "web-vitals": "^2.1.4"
   },

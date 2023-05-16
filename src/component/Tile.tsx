@@ -6,7 +6,7 @@ interface Props {
   column: Column;
   updateBoard: (columnIndex: number) => void;
   currentPlayer: number;
-  hoverTile: number | null;
+   hoverTile: number | null;
   setHoverTile: (hoverTile: number | null) => void;
 }
 
@@ -15,20 +15,15 @@ const Tile: React.FunctionComponent<Props> = ({
   updateBoard,
   column,
   currentPlayer,
-  hoverTile,
-  setHoverTile,
 }: Props): JSX.Element => {
-  const [isHovering, setIsHovering] = useState(false);
-  let tileStatus = "open";
+  const [hoverTile, setHoverTile] = useState<number | null>(null);
+  const [isHovering, setIsHovering] = useState<boolean>(false);
 
-  if (column.player === 1) {
-    tileStatus = "player1";
-  } else if (column.player === 2) {
-    tileStatus = "player2";
-  }
+  const tileStatus = column.player === 1 ? "player1" : column.player === 2 ? "player2" : "open";
 
   const handleMouseEnter = () => {
-    setHoverTile(getBottomEmptyTileIndex());
+    const bottomEmptyTileIndex = getBottomEmptyTileIndex();
+    setHoverTile(bottomEmptyTileIndex);
     setIsHovering(true);
   };
 
@@ -55,9 +50,7 @@ const Tile: React.FunctionComponent<Props> = ({
         onMouseLeave={handleMouseLeave}
       >
         {hoverTile === getBottomEmptyTileIndex() && isHovering && (
-          <div
-          className={`coin-shadow${currentPlayer === 2 ? ' player2-shadow' : ''}`}
-        />
+          <div className={`coin-shadow${currentPlayer === 2 ? ' player2-shadow' : ''}`} />
         )}
         <div className={[tileStatus, "circle"].join(" ")}></div>
       </div>
