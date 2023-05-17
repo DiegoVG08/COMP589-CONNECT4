@@ -13,6 +13,7 @@ const LobbyPage = () => {
     const newLobbyId = newLobbyRef.key;
     // Use the new lobby ID for further operations
     console.log("Generated lobby ID:", newLobbyId);
+    writeLobbyData(newLobbyId);
   };
 
   const initialGameState = {
@@ -25,7 +26,7 @@ const LobbyPage = () => {
   const [gameState, setGameState] = useState(initialGameState);
 
 const writeLobbyData = (lobbyId) => {
-  const lobbyRef = realtime.ref(`lobbies/${lobbyId}`);
+    const lobbyRef =ref( realtime, `lobbies/${lobbyId}`);
 
     // Define the game data
     const gameData = {
@@ -57,7 +58,7 @@ const writeLobbyData = (lobbyId) => {
     event.preventDefault();
   
     // Join the lobby using the provided lobby ID
-    const lobbyRef = realtime.ref(`lobbies/${lobbyId}`);
+    const lobbyRef = ref(realtime, `lobbies/${lobbyId}`);
   
     // Check if the lobby exists
     lobbyRef.once('value', (snapshot) => {
