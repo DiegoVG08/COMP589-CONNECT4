@@ -3,7 +3,7 @@ import GameRow from "src/component/GameRow";
 import { Board } from "src/component/interfaces/Board";
 import { Row } from "src/component/interfaces/Row";
 import { Column } from "src/component/interfaces/Column";
-import {Bot} from "src/Bot/Bot";
+import {Bot} from "../Bot/Bot";
 import { Button, Form, Modal } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, Dispatch, SetStateAction, useCallback } from "react";
@@ -269,59 +269,67 @@ tiles.forEach(tile => {
 
 
 
-  return (
-    <div>
-      <div
-        className="button"
-        onClick={() => {
-          setBoard(initialBoard);
-        }}>
-        New Game
-      </div>
-      <div>
+return (
+  <div>
+  <div className="text-center mt-5">
+    <button className="btn btn-primary mb-3" onClick={() => setBoard(initialBoard)}>
+      New Game
+    </button>
+  </div>
 
-    <Button onClick={() => setBotPlaying(true)}>Start Bot</Button>
-  <label htmlFor="difficulty">Bot Difficulty:</label>
-  <select
-    id="difficulty"
-    value={botDifficulty}
-    onChange={(event) =>
-      setBotDifficulty(event.target.value as "easy" | "hard")
-    }>
-    <option value="easy">Easy</option>
-    <option value="hard">Hard</option>
-  </select>
-  {botPlaying && (
-  <Bot
-    board={board}
-    onColumnSelect={handleColumnSelect}
-    difficulty={botDifficulty}
-  />
-)}
-</div>
-      <table>
-        <thead></thead>
-       <tbody>
-  {board.rows.map((row: Row, i: number): JSX.Element => (
-    <GameRow
-      key={i}
-      row={row}
-      updateBoard={updateBoard}
-      currentPlayer={currPlayer}
-      hoverTile={hoverTile}
-      setHoverTile={setHoverTile}
-    />
-  ))}
-</tbody>
-      </table>
-      <div style={{ textAlign: 'center', padding: '25px', fontSize: '24px' }}>
-        {`Player ${currPlayer}'s Turn`}
-      </div>
+  <div className="border p-3 d-inline-block mb-3">
+    <div className="mb-3">
+      <label htmlFor="difficulty" className="me-2 fw-bold">
+        Bot Options:
+      </label>
+      <select
+        className="form-select me-2"
+        id="difficulty"
+        value={botDifficulty}
+        onChange={(event) =>
+          setBotDifficulty(event.target.value as "easy" | "hard")
+        }
+      >
+        <option value="easy">Easy</option>
+        <option value="hard">Hard</option>
+      </select>
     </div>
+    <div className="pt-1">
+      <button className="btn btn-primary" onClick={() => setBotPlaying(true)}>
+        Start Bot
+      </button>
+    </div>
+  </div>
 
-    
+  {botPlaying && (
+    <Bot
+      board={board}
+      onColumnSelect={handleColumnSelect}
+      difficulty={botDifficulty}
+    />
+  )}
 
-  );
-};
+  <table style={{ marginTop: '-100px' }}>
+    <thead></thead>
+    <tbody>
+      {board.rows.map((row: Row, i: number): JSX.Element => (
+        <GameRow
+          key={i}
+          row={row}
+          updateBoard={updateBoard}
+          currentPlayer={currPlayer}
+          hoverTile={hoverTile}
+          setHoverTile={setHoverTile}
+        />
+      ))}
+    </tbody>
+  </table>
+  <div style={{ textAlign: 'center', padding: '25px', fontSize: '24px' }}>
+    {`Player ${currPlayer}'s Turn`}
+  </div>
+</div>
+);
+        }
+
 
 export default GameBoard;
