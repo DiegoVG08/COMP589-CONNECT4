@@ -1,16 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { getFirestore, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 
 const Leaderboard = () => {
-  // Generate an array of 10 random names and scores
-  const data = Array.from({ length: 10 }, () => ({
-    name: Math.random().toString(36).substring(7),
-    score: Math.floor(Math.random() * 100),
-  }));
+  const [data, setData] = useState([]);
 
-  // Sort data by score in descending order
-  data.sort((a, b) => b.score - a.score);
-
+  useEffect(() => {
+    // Retrieve the top 10 scores from Firestore
+    const db = getFirestore();
+    const q = query(collection(db, 'users'), limit(10));
+    //, orderBy('score', 'desc')
+    getDocs(q).then((querySnapshot) => {
+      const results = [];
+      querySnapshot.forEach((doc) => {
+        results.push({ name: doc.data().username });
+        //, score: doc.data().score
+      });
+      setData(results);
+    }).catch((error) => {
+      console.error(error);
+    });
+  }, []);
+  
   return (
     <div className="container">
       <h1 className="text-center">Leaderboard</h1>
@@ -24,7 +35,7 @@ const Leaderboard = () => {
         </thead>
         <tbody>
           {data.map((item, index) => (
-            <tr key={item.name}>
+            <tr key={index}>
               <th scope="row">{index + 1}</th>
               <td>{item.name}</td>
               <td className="text-end">{item.score}</td>

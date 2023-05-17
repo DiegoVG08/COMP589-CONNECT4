@@ -1,41 +1,42 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './component/NavBar';
 import Login from './pages/login';
 import Home from './pages/userlogin';
 import Leaderboard from "./pages/leaderboard";
 import AccountPage from "./pages/Account";
 import GameBoard from 'src/component/GameBoard';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
+
+
+
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState({});
-
-  const handleLogin = (loggedInUser) => {
+  const [user, setUser] = useState({}); // Define user state variable
+  console.log(user);
+  const updateUser = (newUser) => setUser(newUser);
+  const handleLogin = () => {
     setIsLoggedIn(true);
-    setUser(loggedInUser);
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setUser({});
   };
 
   return (
     <Router>
-
-        <Navbar />
-        <Routes>
-          <Route path='/Home' element={<Home />} />
-          <Route path='/Register' element={<Login />} />
-          <Route path='/leaderboard' element={<Leaderboard />} />
-          <Route path='/Game' element={<GameBoard />} />
-          <Route path='/Account' element={<AccountPage />} />
-        </Routes>
-      
+      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} user={user}/>
+      <Routes>
+        <Route path='/Home' element={<Home />} />
+        <Route path='/Register' element={<Login handleLogin={handleLogin} />} />
+        <Route path='/leaderboard' element={<Leaderboard />} />
+        <Route path='/Game' element={ <GameBoard />} />
+        <Route path='/Account' element={<AccountPage user={user} updateUser={updateUser} />} />
+      </Routes>
     </Router>
   );
+  
 }
 
 export default App;
