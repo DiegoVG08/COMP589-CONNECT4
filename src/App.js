@@ -5,6 +5,8 @@ import Home from './pages/userlogin';
 import Leaderboard from "./pages/leaderboard";
 import AccountPage from "./pages/Account";
 import GameBoard from 'src/component/GameBoard';
+import Connect4Board from "./component/newInterfaces/board";
+import LobbyPage from "./component/newInterfaces/lobbyPage";
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
@@ -24,6 +26,8 @@ function App() {
     setIsLoggedIn(false);
   };
 
+
+
   return (
     <Router>
       <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} user={user}/>
@@ -31,7 +35,8 @@ function App() {
         <Route path='/Home' element={<Home />} />
         <Route path='/Register' element={<Login handleLogin={handleLogin} />} />
         <Route path='/leaderboard' element={<Leaderboard />} />
-        <Route path='/Game' element={ <GameBoard />} />
+        <Route path="/Game" element={<LobbyPage />} />
+        <Route path="/Lobby" element={<LobbyPage />} />
         <Route path='/Account' element={<AccountPage user={user} updateUser={updateUser} />} />
       </Routes>
     </Router>

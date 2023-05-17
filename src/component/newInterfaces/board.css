@@ -1,0 +1,39 @@
+.connect4-board {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .connect4-row {
+    display: flex;
+  }
+  
+  .connect4-tile {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .player-1 {
+    background-color: red;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .player-2 {
+    background-color: yellow;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .game-result {
+    margin-top: 20px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
