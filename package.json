@@ -17,6 +17,8 @@
     "bootstrap": "^5.2.3",
     "escomplex": "^2.0.0-alpha",
     "firebase": "^9.18.0",
+    "fs": "^0.0.1-security",
+    "path-browserify": "^1.0.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",
     "react-dom": "^18.2.0",
