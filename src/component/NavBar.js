@@ -1,8 +1,18 @@
 import React from "react";
 import { Navbar, Nav } from "react-bootstrap";
+import { auth } from "./Firebase";
+
+
 
 const NavBar = (props) => {
-  const { user, handleLogout } = props;
+  const { user } = props;
+
+
+  const handleLogout = () => {
+    auth.signOut();
+  };
+
+  
   return (
     <Navbar style={{ color: "white", borderBottom: "2.5px solid #ccc" }} variant="dark" expand="lg" user={user}>
       <Navbar.Brand href="#" className="pl-3" style={{ font: "Roboto", fontSize: 21 }}>
@@ -24,12 +34,16 @@ const NavBar = (props) => {
             Game
           </Nav.Link>
         </Nav>
-        {user && user.username && (
-          <Nav.Link>
-            <p>Hello, {user.username}!</p>
-            <button onClick={handleLogout}>Logout</button>
+         {user && user.username ? (
+          <Nav className="ml-auto">
+            <Nav.Link>
+              <p className="text-white mb-0 mr-2">Hello, {user.username}!</p>
+              <button onClick={handleLogout} className="btn btn-outline-light">
+                Logout
+              </button>
           </Nav.Link>
-        )}
+          </Nav>
+           ) : null}
       </Navbar.Collapse>
     </Navbar>
   );
