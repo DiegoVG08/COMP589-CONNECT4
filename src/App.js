@@ -4,6 +4,7 @@ import Login from './pages/login';
 import Home from './pages/userlogin';
 import Leaderboard from "./pages/leaderboard";
 import AccountPage from "./pages/Account";
+import Game from "./component/new/src/components/Game";
 import GameBoard from 'src/component/GameBoard';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
