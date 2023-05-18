@@ -1,15 +1,18 @@
-import { getDatabase, onValue, ref, push, child, set, once, get} from "firebase/database";
-import React, { useState } from 'react';
+import { getDatabase, onValue, ref, push, child, set, once, get, runTransaction } from "firebase/database";
+import React, { useState, useEffect } from 'react';
 import { db, realtime } from '../Firebase';
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import { useNavigate } from 'react-router-dom';
 
 const LobbyPage = () => {
   const [lobbyId, setLobbyId] = useState('');
   const [joined, setJoined] = useState(false);
   const [generatedLobbyId, setGeneratedLobbyId] = useState('');
-
+  const [playerCount, setPlayerCount] = useState(0);
+  const [gameStarted, setGameStarted] = useState(false);
   const playerId = 'player1'; // Replace with actual player ID logic
+
+  const navigate = useNavigate();
 
   const generateLobbyId = () => {
     const lobbiesRef = ref(realtime, "lobbies");
@@ -29,10 +32,9 @@ const LobbyPage = () => {
   };
 
   const [gameState, setGameState] = useState(initialGameState);
-
-const writeLobbyData = (lobbyId) => {
-    const lobbyRef =ref(realtime, `lobbies/${lobbyId}`);
-
+  const writeLobbyData = (lobbyId) => {
+    const lobbyRef = ref(realtime, `lobbies/${lobbyId}`);
+  
     // Define the game data
     const gameData = {
       board: Array(42).fill(null), // Array of 42 tiles initialized with null values
@@ -40,14 +42,14 @@ const writeLobbyData = (lobbyId) => {
       playerTurn: 1,
       turnNumber: 1,
     };
-
+  
     // Define the lobby data
     const lobbyData = {
       lobbyId: lobbyId,
       gameData: gameData,
-      // Include any other lobby-related properties
+      playerCount: 1, // Initialize player count to 1
     };
-
+  
     set(lobbyRef, lobbyData)
       .then(() => {
         // Lobby data has been successfully written
@@ -66,47 +68,92 @@ const writeLobbyData = (lobbyId) => {
     const lobbyRef = ref(realtime, `lobbies/${lobbyId}`);
   
     // Check if the lobby exists
-    get(lobbyRef).then((snapshot) => {
-      if (snapshot.exists()) {
-        // Lobby exists, join the lobby
-        joinLobby(lobbyId);
-        setJoined(true);
-      } else {
-        // Lobby does not exist, show an error message or handle it appropriately
-        console.log("Lobby not found");
-      }
-    }).catch((error) => {
-      // Handle any errors that occurred during the read operation
-      console.error("Error reading lobby data:", error);
-    });
+    get(lobbyRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          // Lobby exists, join the lobby
+          const playerCountRef = child(lobbyRef, "playerCount");
+          runTransaction(playerCountRef, (currentCount) => {
+            // If currentCount is null or undefined, default it to 1
+            return (currentCount || 1) + 1;
+          })
+            .then((transactionResult) => {
+              if (transactionResult.committed) {
+                // Player count was successfully updated
+                const updatedCount = transactionResult.snapshot.val();
+                setPlayerCount(updatedCount);
+  
+                // Check the player count
+                if (updatedCount === 2) {
+                  // Two players have joined, start the game
+                  setGameStarted(true);
+                }
+  
+                setJoined(true);
+              }
+            })
+            .catch((error) => {
+              console.error("Error updating player count:", error);
+            });
+        } else {
+          // Lobby does not exist, show an error message or handle it appropriately
+          console.log("Lobby not found");
+        }
+      })
+      .catch((error) => {
+        // Handle any errors that occurred during the read operation
+        console.error("Error reading lobby data:", error);
+      });
   };
+  
   
 
   const joinLobby = (lobbyId) => {
     const lobbyRef = ref(realtime, `lobbies/${lobbyId}`);
   
-    onValue(lobbyRef, (snapshot) => {
-      const lobbyData = snapshot.val();
-     
-      if (lobbyData) {
-        // Update the game state based on the lobby data
-        const updatedGameState = {
-          board: lobbyData.gameData.board,
-          isGameDone: lobbyData.gameData.isGameDone,
-          playerTurn: lobbyData.gameData.playerTurn,
-          turnNumber: lobbyData.gameData.turnNumber,
-        };
-        console.log(`Joining lobby with ID: ${lobbyId}`);
-        // Perform additional game logic as needed
+    // Increment the player count in the lobby data
+    lobbyRef.child("playerCount").transaction((currentCount) => {
+      // If currentCount is null or undefined, default it to 1
+      return (currentCount || 1) + 1;
+    }, (error, committed, snapshot) => {
+      if (error) {
+        // Handle the error
+        console.error("Error updating player count:", error);
+      } else if (committed) {
+        // Player count was successfully updated
+        const updatedCount = snapshot.val();
+        setPlayerCount(updatedCount);
   
-        // Set the updated game state
-        setGameState(updatedGameState);
+        // Check the player count
+        if (updatedCount === 2) {
+          // Two players have joined, start the game
+          setGameStarted(true);
+        }
+      }
+    });
+  
+    // Listen for changes to the player count
+    onValue(child(lobbyRef, "playerCount"), (snapshot) => {
+      const playerCount = snapshot.val();
+      setPlayerCount(playerCount);
+  
+      // Check the player count
+      if (playerCount === 2) {
+        // Two players have joined, start the game
+        setGameStarted(true);
       }
     });
   };
-
+  
+  
+  
+  
   const handleClick = (tileIndex) => {
-    if (!gameState.isGameDone && gameState.board[tileIndex] === null && gameState.playerTurn === playerId) {
+    if (
+      !gameState.isGameDone &&
+      gameState.board[tileIndex] === null &&
+      gameState.playerTurn === playerId
+    ) {
       // Update the board with the player's move
       const updatedBoard = [...gameState.board];
       updatedBoard[tileIndex] = playerId;
@@ -159,11 +206,21 @@ const writeLobbyData = (lobbyId) => {
     textField.remove();
   };
 
+  useEffect(() => {
+    if (gameStarted) {
+      navigate(`/Game/${lobbyId}`);
+    }
+  }, [gameStarted, lobbyId, navigate]);
+
   return (
     <div className="container">
       <h1 className="text-center">Connect4 Lobby</h1>
       {joined ? (
-        <p className="text-center">You have joined Lobby ID: {lobbyId}</p>
+        playerCount === 2 ? (
+          <p>Redirecting to the game screen...</p>
+        ) : (
+          <p>Waiting for opponent...</p>
+        )
       ) : (
         <div>
           <p className="text-center mt-3 mb-3">Create Game</p>
@@ -176,25 +233,45 @@ const writeLobbyData = (lobbyId) => {
             <div className="text-center mb-3">
               <label>
                 Generated Lobby ID:
-                <input type="text" className="form-control" value={generatedLobbyId} readOnly />
+                <input
+                  type="text"
+                  className="form-control"
+                  value={generatedLobbyId}
+                  readOnly
+                />
               </label>
-              <button className="btn btn-secondary" onClick={copyToClipboard}>
-                Copy
+              <button
+                className="btn btn-secondary"
+                onClick={copyToClipboard}
+              >
+                Copy to Clipboard
               </button>
             </div>
           )}
-          <p className="text-center mt-3 mb-3">OR</p>
-          <p className="text-center mt-3 mb-3">Join Lobby</p>
-          <div className="d-flex justify-content-center mt-3">
-            <form onSubmit={handleJoinLobby}>
-              <input type="text" className="form-control" value={lobbyId} onChange={(e) => setLobbyId(e.target.value)} />
-              <button type="submit" className="btn btn-primary m-5">Join Lobby</button>
-            </form>
-          </div>
+          <p className="text-center mt-3 mb-3">Join Game</p>
+          <form onSubmit={handleJoinLobby}>
+            <div className="text-center mb-3">
+              <label>
+                Lobby ID:
+                <input
+                  type="text"
+                  className="form-control"
+                  value={lobbyId}
+                  onChange={(e) => setLobbyId(e.target.value)}
+                  required
+                />
+              </label>
+            </div>
+            <div className="text-center">
+              <button type="submit" className="btn btn-primary">
+                Join Lobby
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>
   );
-          }
-  
+};
+
 export default LobbyPage;

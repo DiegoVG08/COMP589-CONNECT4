@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 const Tile = ({ value, onClick }) => {
   const tileClass = `connect4-tile player-${value}`;
@@ -13,6 +14,7 @@ const Connect4Board = () => {
   const [board, setBoard] = useState(() => Array(6).fill(Array(7).fill(null)));
   const [currentPlayer, setCurrentPlayer] = useState(1);
   const [isGameDone, setIsGameDone] = useState(false);
+  const { lobbyId } = useParams();
 
   const handleColumnClick = (colIndex) => {
     if (isGameDone) return;
@@ -119,6 +121,8 @@ const Connect4Board = () => {
 
   return (
     <div className="connect4-board">
+      <h1>Lobby ID: {lobbyId}</h1>
+      <h2>Player {currentPlayer}'s turn</h2>
       {board.map((row, rowIndex) => (
         <div key={rowIndex} className="connect4-row">
           {row.map((tile, colIndex) => (
@@ -130,7 +134,9 @@ const Connect4Board = () => {
           ))}
         </div>
       ))}
-      {isGameDone && <p>{isGameDone.gameResult}</p>}
+      {isGameDone && (
+        <p>{checkForDraw(board) ? 'The game is a draw!' : `Player ${currentPlayer} wins!`}</p>
+      )}
     </div>
   );
 };

@@ -17,6 +17,8 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState({}); // Define user state variable
   console.log(user);
+  const [lobbyId, setLobbyId] = useState(null); 
+
   const updateUser = (newUser) => setUser(newUser);
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -35,8 +37,11 @@ function App() {
         <Route path='/Home' element={<Home />} />
         <Route path='/Register' element={<Login handleLogin={handleLogin} />} />
         <Route path='/leaderboard' element={<Leaderboard />} />
-        <Route path="/Game" element={<LobbyPage />} />
-        <Route path="/Lobby" element={<LobbyPage />} />
+        <Route
+          path="/Game/:lobbyId"
+          element={<Connect4Board lobbyId={lobbyId} />} // Pass lobbyId as prop
+        />
+        <Route path="/Game" element={<LobbyPage setLobbyId={setLobbyId} />} />
         <Route path='/Account' element={<AccountPage user={user} updateUser={updateUser} />} />
       </Routes>
     </Router>
