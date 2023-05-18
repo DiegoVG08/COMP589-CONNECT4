@@ -139,7 +139,7 @@ const Connect4Board = () => {
 
   useEffect(() => {
     if (isOpponentJoined && currentPlayer === 1) {
-      setCurrentPlayer(2);
+      setCurrentPlayer(1);
     }
   }, [isOpponentJoined, currentPlayer]);
 
