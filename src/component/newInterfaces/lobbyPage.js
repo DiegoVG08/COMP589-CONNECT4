@@ -47,7 +47,7 @@ const LobbyPage = () => {
     const lobbyData = {
       lobbyId: lobbyId,
       gameData: gameData,
-      playerCount: 1, // Initialize player count to 1
+      playerCount: 0, // Initialize player count to 1
     };
   
     set(lobbyRef, lobbyData)
@@ -74,8 +74,8 @@ const LobbyPage = () => {
           // Lobby exists, join the lobby
           const playerCountRef = child(lobbyRef, "playerCount");
           runTransaction(playerCountRef, (currentCount) => {
-            // If currentCount is null or undefined, default it to 1
-            return (currentCount || 1) + 1;
+            // If currentCount is null or undefined, default it to 0
+            return (currentCount || 0) + 1;
           })
             .then((transactionResult) => {
               if (transactionResult.committed) {
@@ -84,8 +84,8 @@ const LobbyPage = () => {
                 setPlayerCount(updatedCount);
   
                 // Check the player count
-                if (updatedCount === 2) {
-                  // Two players have joined, start the game
+                if (updatedCount >= 2) {
+                  // Both players have joined, start the game
                   setGameStarted(true);
                 }
   
@@ -101,7 +101,6 @@ const LobbyPage = () => {
         }
       })
       .catch((error) => {
-        // Handle any errors that occurred during the read operation
         console.error("Error reading lobby data:", error);
       });
   };
@@ -114,7 +113,7 @@ const LobbyPage = () => {
     // Increment the player count in the lobby data
     lobbyRef.child("playerCount").transaction((currentCount) => {
       // If currentCount is null or undefined, default it to 1
-      return (currentCount || 1) + 1;
+      return (currentCount || 0) + 1;
     }, (error, committed, snapshot) => {
       if (error) {
         // Handle the error
@@ -124,11 +123,7 @@ const LobbyPage = () => {
         const updatedCount = snapshot.val();
         setPlayerCount(updatedCount);
   
-        // Check the player count
-        if (updatedCount === 2) {
-          // Two players have joined, start the game
-          setGameStarted(true);
-        }
+    
       }
     });
   
