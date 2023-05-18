@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { ref, onValue, set, off } from 'firebase/database';
+import { realtime } from '../Firebase';
 
 const Tile = ({ value, onClick }) => {
   const tileClass = `connect4-tile player-${value}`;
@@ -14,7 +16,23 @@ const Connect4Board = () => {
   const [board, setBoard] = useState(() => Array(6).fill(Array(7).fill(null)));
   const [currentPlayer, setCurrentPlayer] = useState(1);
   const [isGameDone, setIsGameDone] = useState(false);
+  const [isOpponentJoined, setIsOpponentJoined] = useState(false);
   const { lobbyId } = useParams();
+
+  useEffect(() => {
+    const lobbyRef = ref(realtime, `lobbies/${lobbyId}`);
+    const unsubscribe = onValue(lobbyRef, (snapshot) => {
+      const lobbyData = snapshot.val();
+      if (lobbyData && lobbyData.playerCount === 2) {
+        setIsOpponentJoined(true);
+        off(lobbyRef, 'value'); // Unsubscribe from further changes
+      }
+    });
+
+    return () => {
+      off(lobbyRef, 'value'); // Cleanup: Unsubscribe from the listener when the component unmounts
+    };
+  }, [lobbyId]);
 
   const handleColumnClick = (colIndex) => {
     if (isGameDone) return;
@@ -119,10 +137,26 @@ const Connect4Board = () => {
     return true; // All tiles are filled, the game is a draw
   };
 
+  useEffect(() => {
+    if (isOpponentJoined && currentPlayer === 1) {
+      setCurrentPlayer(2);
+    }
+  }, [isOpponentJoined, currentPlayer]);
+
+  useEffect(() => {
+    if (currentPlayer === 1 && isOpponentJoined) {
+      setIsGameDone(false);
+    }
+  }, [currentPlayer, isOpponentJoined]);
+
   return (
     <div className="connect4-board">
       <h1>Lobby ID: {lobbyId}</h1>
-      <h2>Player {currentPlayer}'s turn</h2>
+      {!isOpponentJoined ? (
+        <h2>Waiting for opponent...</h2>
+      ) : (
+        <h2>Player {currentPlayer}'s turn</h2>
+      )}
       {board.map((row, rowIndex) => (
         <div key={rowIndex} className="connect4-row">
           {row.map((tile, colIndex) => (

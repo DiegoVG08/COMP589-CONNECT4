@@ -12,6 +12,7 @@ const LobbyPage = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const playerId = 'player1'; // Replace with actual player ID logic
 
+
   const navigate = useNavigate();
 
   const generateLobbyId = () => {
@@ -63,10 +64,10 @@ const LobbyPage = () => {
 
   const handleJoinLobby = (event) => {
     event.preventDefault();
-  
+
     // Join the lobby using the provided lobby ID
     const lobbyRef = ref(realtime, `lobbies/${lobbyId}`);
-  
+
     // Check if the lobby exists
     get(lobbyRef)
       .then((snapshot) => {
@@ -74,29 +75,21 @@ const LobbyPage = () => {
           // Lobby exists, join the lobby
           const playerCountRef = child(lobbyRef, "playerCount");
           runTransaction(playerCountRef, (currentCount) => {
-            // If currentCount is null or undefined, default it to 0
             return (currentCount || 0) + 1;
           })
             .then((transactionResult) => {
               if (transactionResult.committed) {
-                // Player count was successfully updated
                 const updatedCount = transactionResult.snapshot.val();
                 setPlayerCount(updatedCount);
-  
-                // Check the player count
-                if (updatedCount >= 2) {
-                  // Both players have joined, start the game
-                  setGameStarted(true);
-                }
-  
-                setJoined(true);
+
+                // Redirect to the game screen
+                navigate(`/Game/${lobbyId}`);
               }
             })
             .catch((error) => {
               console.error("Error updating player count:", error);
             });
         } else {
-          // Lobby does not exist, show an error message or handle it appropriately
           console.log("Lobby not found");
         }
       })
@@ -202,10 +195,11 @@ const LobbyPage = () => {
   };
 
   useEffect(() => {
-    if (gameStarted) {
-      navigate(`/Game/${lobbyId}`);
+    if (playerCount >= 2) {
+      // Both players have joined
+      setGameStarted(true);
     }
-  }, [gameStarted, lobbyId, navigate]);
+  }, [playerCount]);
 
   return (
     <div className="container">
