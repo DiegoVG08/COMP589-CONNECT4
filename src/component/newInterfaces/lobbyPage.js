@@ -1,10 +1,14 @@
 import { getDatabase, ref, push, child, set} from "firebase/database";
 import React, { useState } from 'react';
 import { db, realtime } from '../Firebase';
+import "bootstrap/dist/css/bootstrap.min.css";
+
 
 const LobbyPage = () => {
   const [lobbyId, setLobbyId] = useState('');
   const [joined, setJoined] = useState(false);
+  const [generatedLobbyId, setGeneratedLobbyId] = useState('');
+
   const playerId = 'player1'; // Replace with actual player ID logic
 
   const generateLobbyId = () => {
@@ -13,6 +17,7 @@ const LobbyPage = () => {
     const newLobbyId = newLobbyRef.key;
     // Use the new lobby ID for further operations
     console.log("Generated lobby ID:", newLobbyId);
+    setGeneratedLobbyId(newLobbyId);
     writeLobbyData(newLobbyId);
   };
 
@@ -26,7 +31,7 @@ const LobbyPage = () => {
   const [gameState, setGameState] = useState(initialGameState);
 
 const writeLobbyData = (lobbyId) => {
-    const lobbyRef =ref( realtime, `lobbies/${lobbyId}`);
+    const lobbyRef =ref(realtime, `lobbies/${lobbyId}`);
 
     // Define the game data
     const gameData = {
@@ -75,7 +80,7 @@ const writeLobbyData = (lobbyId) => {
   
 
   const joinLobby = (lobbyId) => {
-    const lobbyRef = realtime.ref(`lobbies/${lobbyId}`);
+    const lobbyRef = ref( realtime, `lobbies/${lobbyId}`);
 
     lobbyRef.on('value', (snapshot) => {
       const lobbyData = snapshot.val();
@@ -124,7 +129,7 @@ const writeLobbyData = (lobbyId) => {
       setGameState(updatedGameState);
 
       // Update the lobby data in Firebase
-      db.ref(`lobbies/${lobbyId}/gameData`).update(updatedGameState);
+      ref(realtime, `lobbies/${lobbyId}/gameData`).update(updatedGameState);
     }
   };
 
@@ -142,22 +147,51 @@ const writeLobbyData = (lobbyId) => {
     return false; // Replace with the actual draw condition check
   };
 
+  const copyToClipboard = () => {
+    const textField = document.createElement('textarea');
+    textField.innerText = generatedLobbyId;
+    document.body.appendChild(textField);
+    textField.select();
+    document.execCommand('copy');
+    textField.remove();
+  };
+
   return (
-    <div>
-      <h1>Connect4 Lobby</h1>
+    <div className="container">
+      <h1 className="text-center">Connect4 Lobby</h1>
       {joined ? (
-        <p>You have joined Lobby ID: {lobbyId}</p>
+        <p className="text-center">You have joined Lobby ID: {lobbyId}</p>
       ) : (
         <div>
-          <button onClick={generateLobbyId}>Generate Lobby ID</button>
-          <form onSubmit={handleJoinLobby}>
-            <input type="text" value={lobbyId} onChange={(e) => setLobbyId(e.target.value)} />
-            <button type="submit">Join Lobby</button>
-          </form>
+          <p className="text-center mt-3 mb-3">Create Game</p>
+          <div className="text-center mb-3">
+            <button className="btn btn-primary" onClick={generateLobbyId}>
+              Generate Lobby ID
+            </button>
+          </div>
+          {generatedLobbyId && (
+            <div className="text-center mb-3">
+              <label>
+                Generated Lobby ID:
+                <input type="text" className="form-control" value={generatedLobbyId} readOnly />
+              </label>
+              <button className="btn btn-secondary" onClick={copyToClipboard}>
+                Copy
+              </button>
+            </div>
+          )}
+          <p className="text-center mt-3 mb-3">OR</p>
+          <p className="text-center mt-3 mb-3">Join Lobby</p>
+          <div className="d-flex justify-content-center mt-3">
+            <form onSubmit={handleJoinLobby}>
+              <input type="text" className="form-control" value={lobbyId} onChange={(e) => setLobbyId(e.target.value)} />
+              <button type="submit" className="btn btn-primary m-5">Join Lobby</button>
+            </form>
+          </div>
         </div>
       )}
     </div>
   );
-};
-
+          }
+  
 export default LobbyPage;
