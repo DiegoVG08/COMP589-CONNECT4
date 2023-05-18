@@ -52,12 +52,14 @@ export const BoardContainer = styled.div`
 `;
 
 export const Container = styled.div`
-  ${({ marking }) => marking && "background-color: lightgray;"}
+  ${({ marking }) => marking && "background-color: black;"}
   border: solid 1px black;
   margin-bottom: 30px;
 
   & > div > div {
-    ${({ marking }) => marking && "background-color: lightgray;"}
+    background-color: black;
+    border: solid 1px black;
+
   }
 `;
 

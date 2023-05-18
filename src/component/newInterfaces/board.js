@@ -74,6 +74,11 @@ const Connect4Board = ({ board: initialBoard = []}) => {
       return;
     }
 
+    if (checkForWin(updatedBoard, row, colIndex)) {
+      setIsGameDone(true);
+      return;
+    }
+
     const clickedBlock = document.getElementById(`block-${row}-${colIndex}`);
   if (clickedBlock && clickedBlock.classList) {
     clickedBlock.classList.add(`block`, `player-${currentPlayer}`);
@@ -83,7 +88,7 @@ const Connect4Board = ({ board: initialBoard = []}) => {
   };
   
 
-  const checkForWin = (player) => {
+  const checkForWin = (board, player) => {
     // Check horizontal
     for (let row = 0; row < 6; row++) {
       for (let col = 0; col < 4; col++) {
@@ -97,7 +102,7 @@ const Connect4Board = ({ board: initialBoard = []}) => {
         }
       }
     }
-
+  
     // Check vertical
     for (let row = 0; row < 3; row++) {
       for (let col = 0; col < 7; col++) {
@@ -111,7 +116,7 @@ const Connect4Board = ({ board: initialBoard = []}) => {
         }
       }
     }
-
+  
     // Check diagonal (top-left to bottom-right)
     for (let row = 0; row < 3; row++) {
       for (let col = 0; col < 4; col++) {
@@ -125,7 +130,7 @@ const Connect4Board = ({ board: initialBoard = []}) => {
         }
       }
     }
-
+  
     // Check diagonal (top-right to bottom-left)
     for (let row = 0; row < 3; row++) {
       for (let col = 3; col < 7; col++) {
@@ -139,9 +144,11 @@ const Connect4Board = ({ board: initialBoard = []}) => {
         }
       }
     }
-
+  
     return false;
   };
+  
+  
 
   const checkForDraw = (board) => {
     for (let row = 0; row < 6; row++) {
@@ -197,7 +204,7 @@ const Connect4Board = ({ board: initialBoard = []}) => {
           ))}
         </Container>
       </BoardContainer>
-      
+
       {isGameDone && (
         <p>{checkForDraw(board) ? 'The game is a draw!' : `Player ${currentPlayer} wins!`}</p>
       )}
