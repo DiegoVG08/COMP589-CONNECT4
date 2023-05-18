@@ -133,9 +133,6 @@ const LobbyPage = () => {
     });
   };
   
-  
-  
-  
   const handleClick = (tileIndex) => {
     if (
       !gameState.isGameDone &&

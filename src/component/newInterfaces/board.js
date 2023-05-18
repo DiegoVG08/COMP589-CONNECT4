@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ref, onValue, set, off } from 'firebase/database';
 import { realtime } from '../Firebase';
+import { Block, Container, Row } from './styling';
+
 
 const Tile = ({ value, onClick }) => {
   const tileClass = `connect4-tile player-${value}`;
@@ -12,8 +14,11 @@ const Tile = ({ value, onClick }) => {
   );
 };
 
-const Connect4Board = () => {
-  const [board, setBoard] = useState(() => Array(6).fill(Array(7).fill(null)));
+
+const Connect4Board = ({ board: initialBoard = [], onColumnClick }) => {
+  const [board, setBoard] = useState(() =>
+  Array.from({ length: 6 }, () => Array(7).fill(null))
+);
   const [currentPlayer, setCurrentPlayer] = useState(1);
   const [isGameDone, setIsGameDone] = useState(false);
   const [isOpponentJoined, setIsOpponentJoined] = useState(false);
@@ -150,29 +155,76 @@ const Connect4Board = () => {
   }, [currentPlayer, isOpponentJoined]);
 
   return (
-    <div className="connect4-board">
-      <h1>Lobby ID: {lobbyId}</h1>
-      {!isOpponentJoined ? (
-        <h2>Waiting for opponent...</h2>
-      ) : (
-        <h2>Player {currentPlayer}'s turn</h2>
-      )}
-      {board.map((row, rowIndex) => (
-        <div key={rowIndex} className="connect4-row">
-          {row.map((tile, colIndex) => (
-            <Tile
-              key={colIndex}
-              value={tile}
-              onClick={() => handleColumnClick(colIndex)}
-            />
-          ))}
-        </div>
-      ))}
+    <>
+    <h1>Lobby ID: {lobbyId}</h1>
+    {!isOpponentJoined ? (
+      <h2>Waiting for opponent...</h2>
+    ) : (
+      <h2>Player {currentPlayer}'s turn</h2>
+    )}
+    <Container>
+      <Row>
+        <Block onClick={() => handleColumnClick(0)}>{board[0]}</Block>
+        <Block onClick={() => handleColumnClick(1)}>{board[1]}</Block>
+        <Block onClick={() => handleColumnClick(2)}>{board[2]}</Block>
+        <Block onClick={() => handleColumnClick(3)}>{board[3]}</Block>
+        <Block onClick={() => handleColumnClick(4)}>{board[4]}</Block>
+        <Block onClick={() => handleColumnClick(5)}>{board[5]}</Block>
+        <Block onClick={() => handleColumnClick(6)}>{board[6]}</Block>
+      </Row>
+      <Row>
+        <Block onClick={() => handleColumnClick(7)}>{board[7]}</Block>
+        <Block onClick={() => handleColumnClick(8)}>{board[8]}</Block>
+        <Block onClick={() => handleColumnClick(9)}>{board[9]}</Block>
+        <Block onClick={() => handleColumnClick(10)}>{board[10]}</Block>
+        <Block onClick={() => handleColumnClick(11)}>{board[11]}</Block>
+        <Block onClick={() => handleColumnClick(12)}>{board[12]}</Block>
+        <Block onClick={() => handleColumnClick(13)}>{board[13]}</Block>
+      </Row>
+      <Row>
+        <Block onClick={() => handleColumnClick(14)}>{board[14]}</Block>
+        <Block onClick={() => handleColumnClick(15)}>{board[15]}</Block>
+        <Block onClick={() => handleColumnClick(16)}>{board[16]}</Block>
+        <Block onClick={() => handleColumnClick(17)}>{board[17]}</Block>
+        <Block onClick={() => handleColumnClick(18)}>{board[18]}</Block>
+        <Block onClick={() => handleColumnClick(19)}>{board[19]}</Block>
+        <Block onClick={() => handleColumnClick(20)}>{board[20]}</Block>
+      </Row>
+      <Row>
+        <Block onClick={() => handleColumnClick(21)}>{board[21]}</Block>
+        <Block onClick={() => handleColumnClick(22)}>{board[22]}</Block>
+        <Block onClick={() => handleColumnClick(23)}>{board[23]}</Block>
+        <Block onClick={() => handleColumnClick(24)}>{board[24]}</Block>
+        <Block onClick={() => handleColumnClick(25)}>{board[25]}</Block>
+        <Block onClick={() => handleColumnClick(26)}>{board[26]}</Block>
+        <Block onClick={() => handleColumnClick(27)}>{board[27]}</Block>
+      </Row>
+      <Row>
+        <Block onClick={() => handleColumnClick(28)}>{board[28]}</Block>
+        <Block onClick={() => handleColumnClick(29)}>{board[29]}</Block>
+        <Block onClick={() => handleColumnClick(30)}>{board[30]}</Block>
+        <Block onClick={() => handleColumnClick(31)}>{board[31]}</Block>
+        <Block onClick={() => handleColumnClick(32)}>{board[32]}</Block>
+        <Block onClick={() => handleColumnClick(33)}>{board[33]}</Block>
+        <Block onClick={() => handleColumnClick(34)}>{board[34]}</Block>
+      </Row>
+      <Row>
+        <Block onClick={() => handleColumnClick(35)}>{board[35]}</Block>
+        <Block onClick={() => handleColumnClick(36)}>{board[36]}</Block>
+        <Block onClick={() => handleColumnClick(37)}>{board[37]}</Block>
+        <Block onClick={() => handleColumnClick(38)}>{board[38]}</Block>
+        <Block onClick={() => handleColumnClick(39)}>{board[39]}</Block>
+        <Block onClick={() => handleColumnClick(40)}>{board[40]}</Block>
+        <Block onClick={() => handleColumnClick(41)}>{board[41]}</Block>
+      </Row>
+      </Container>
       {isGameDone && (
         <p>{checkForDraw(board) ? 'The game is a draw!' : `Player ${currentPlayer} wins!`}</p>
       )}
-    </div>
+    </>
   );
+  
+  
 };
 
 export default Connect4Board;
