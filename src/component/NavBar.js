@@ -23,6 +23,9 @@ const NavBar = (props) => {
           <Nav.Link href="/Game" style={{ font: "Roboto" }}>
             Game
           </Nav.Link>
+          <Nav.Link href="/Legacy" style={{ font: "Roboto" }}>
+            Legacy
+          </Nav.Link>
         </Nav>
         {user && user.username && (
           <Nav.Link>

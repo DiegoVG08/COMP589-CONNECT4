@@ -18,6 +18,8 @@ const LobbyPage = () => {
   const [playerCount, setPlayerCount] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const playerId = 'player1'; // Replace with actual player ID logic
+  const [username, setUsername] = useState('');
+  const [playerRole, setPlayerRole] = useState(null);
 
 
   const navigate = useNavigate();
@@ -71,13 +73,10 @@ const LobbyPage = () => {
       });
   };
 
+  
   const handleJoinLobby = async (event) => {
     event.preventDefault();
-  
-    // Join the lobby using the provided lobby ID
     const lobbyRef = ref(realtime, `lobbies/${lobbyId}`);
-  
-    // Check if the lobby exists
     get(lobbyRef)
       .then(async (snapshot) => {
         if (snapshot.exists()) {
@@ -86,86 +85,65 @@ const LobbyPage = () => {
   
           if (playerCount < 2) {
             const assignedPlayer = playerCount === 0 ? 'player1' : 'player2';
+            const playerUsername = playerCount === 0 ? username : ` ${username}`;
   
-            // Fetch the username using Firebase Authentication and Firestore
-            const currentUser = auth.currentUser;
-            const uid = currentUser.uid;
-            const userDocRef = doc(db, 'users', uid);
+            lobbyData.playerCount += 1;
+            lobbyData[assignedPlayer] = {
+              username: playerUsername,
+            };
   
-            getDoc(userDocRef)
-              .then((doc) => {
-                if (doc.exists()) {
-                  const username = doc.data().username;
-  
-                  // Assign the username to the corresponding player
-                  lobbyData.playerCount += 1;
-                  lobbyData[assignedPlayer] = {
-                    uid,
-                    username,
-                  };
-  
-                  // Update the lobby data in Firebase
-                  set(lobbyRef, lobbyData)
-                    .then(() => {
-                      // Redirect to the game screen
-                      navigate(`/Game/${lobbyId}`);
-                    })
-                    .catch((error) => {
-                      console.error("Error joining lobby:", error);
-                    });
-                } else {
-                  console.log("User document not found");
-                }
+            set(lobbyRef, lobbyData)
+              .then(() => {
+                navigate(`/Game/${lobbyId}`);
               })
               .catch((error) => {
-                console.error("Error fetching user document:", error);
+                console.error("Error joining lobby:", error);
               });
-          } else {
-            console.log("Lobby is full");
           }
-        } else {
-          console.log("Lobby not found");
         }
       })
       .catch((error) => {
-        console.error("Error reading lobby data:", error);
+        console.log("Error checking lobby existence:", error);
       });
   };
-  
   
 
   const joinLobby = (lobbyId) => {
     const lobbyRef = ref(realtime, `lobbies/${lobbyId}`);
-  
-    // Increment the player count in the lobby data
-    lobbyRef.child("playerCount").transaction((currentCount) => {
-      // If currentCount is null or undefined, default it to 1
-      return (currentCount || 0) + 1;
-    }, (error, committed, snapshot) => {
-      if (error) {
-        // Handle the error
-        console.error("Error updating player count:", error);
-      } else if (committed) {
-        // Player count was successfully updated
-        const updatedCount = snapshot.val();
-        setPlayerCount(updatedCount);
-  
-    
+    lobbyRef.child("playerCount").transaction(
+      (currentCount) => {
+        return (currentCount || 0) + 1;
+      },
+      (error, committed, snapshot) => {
+        if (error) {
+          console.error("Error updating player count:", error);
+        } else if (committed) {
+          const updatedCount = snapshot.val();
+          setPlayerCount(updatedCount);
+        }
       }
-    });
-  
-    // Listen for changes to the player count
+    );
     onValue(child(lobbyRef, "playerCount"), (snapshot) => {
       const playerCount = snapshot.val();
       setPlayerCount(playerCount);
-  
-      // Check the player count
       if (playerCount === 2) {
-        // Two players have joined, start the game
         setGameStarted(true);
       }
     });
+    onValue(child(lobbyRef, "player1"), (snapshot) => {
+      const player1Data = snapshot.val();
+      if (player1Data && player1Data.username) {
+        setPlayerRole(player1Data.username === username ? 'player1' : 'player2');
+      }
+    });
+    onValue(child(lobbyRef, "player2"), (snapshot) => {
+      const player2Data = snapshot.val();
+      if (player2Data && player2Data.username) {
+        setPlayerRole(player2Data.username === username ? 'player2' : 'player1');
+      }
+    });
   };
+  
   
   const handleClick = (tileIndex) => {
     if (
@@ -278,6 +256,18 @@ const LobbyPage = () => {
                   className="form-control"
                   value={lobbyId}
                   onChange={(e) => setLobbyId(e.target.value)}
+                  required
+                />
+              </label>
+            </div>
+            <div className="text-center mb-3">
+              <label>
+                Temporary Username:
+                <input
+                  type="text"
+                  className="form-control"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </label>

@@ -81,6 +81,7 @@ function App() {
         />
         <Route path="/Game" element={<LobbyPage setLobbyId={setLobbyId} />} />
         <Route path='/Account' element={<AccountPage user={user} updateUser={updateUser} />} />
+        <Route path='/Legacy' element={<GameBoard/>} />
       </Routes>
     </Router>
     </Provider>

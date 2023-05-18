@@ -120,7 +120,7 @@ const Connect4Board = ({ board: initialBoard = []}) => {
       player: currentPlayer,
       block: row * 7 + colIndex,
     };
-
+  
     const updatedBlocks = {
       ...(gameData.blocks || {}),
       [row]: {
@@ -133,9 +133,19 @@ const Connect4Board = ({ board: initialBoard = []}) => {
     set(gameDataRef, {
       ...gameData,
       turnNumber: gameData.turnNumber + 1,
-      playerTurn: currentPlayer === 1 ? 2 : 1,
+      playerTurn: 2, // Set the player turn to Player 2
       blocks: updatedBlocks,
     });
+
+    if (currentPlayer === 1) {
+      const gameDataRef = ref(realtime, `lobbies/${lobbyId}/gameData`);
+      set(gameDataRef, {
+        ...gameData,
+        turnNumber: gameData.turnNumber + 1,
+        playerTurn: 2,
+        blocks: updatedBlocks,
+      });
+    }
   
     if (checkForDraw(updatedBoard)) {
       setIsGameDone(true);
@@ -146,9 +156,7 @@ const Connect4Board = ({ board: initialBoard = []}) => {
       setIsGameDone(true);
       return;
     }
-
   
-
     setCurrentPlayer(2);
   };
   
