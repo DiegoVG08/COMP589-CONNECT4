@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { ref, onValue, set, off } from 'firebase/database';
-import { realtime } from '../Firebase';
+import { ref, onValue, set, off, update, runTransaction, once, get } from 'firebase/database';
+import { db, realtime } from '../Firebase';
 import { Block, Container, Row, BoardContainer } from './styling';
 import './board.css'
+import { useDispatch } from 'react-redux';
+import { fetchUsername  } from '../../reducers/userActions';
+
 
 const Connect4Board = ({ board: initialBoard = []}) => {
   const [board, setBoard] = useState(() =>
@@ -11,9 +14,10 @@ const Connect4Board = ({ board: initialBoard = []}) => {
   const [currentPlayer, setCurrentPlayer] = useState(1);
   const [isGameDone, setIsGameDone] = useState(false);
   const [isOpponentJoined, setIsOpponentJoined] = useState(false);
-  const { lobbyId } = useParams();
+  const [loading, setLoading] = useState(false);
 
-  
+  const { lobbyId } = useParams();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const lobbyRef = ref(realtime, `lobbies/${lobbyId}`);
@@ -21,6 +25,7 @@ const Connect4Board = ({ board: initialBoard = []}) => {
       const lobbyData = snapshot.val();
       if (lobbyData && lobbyData.playerCount === 2) {
         setIsOpponentJoined(true);
+        setCurrentPlayer(lobbyData.currentPlayer === 1 ? 2 : 1);// Assign player 2 to the second player who joins
         off(lobbyRef, 'value'); // Unsubscribe from further changes
       }
     });
@@ -30,6 +35,60 @@ const Connect4Board = ({ board: initialBoard = []}) => {
     };
   }, [lobbyId]);
 
+  const handlePlayerJoin = async () => {
+    const lobbyRef = ref(db, `lobbies/${lobbyId}`);
+    const gameDataRef = ref(db, `lobbies/${lobbyId}/gameData`);
+  
+    try {
+      const lobbyDataSnapshot = await get(lobbyRef);
+      const lobbyData = lobbyDataSnapshot.val();
+  
+      if (!lobbyData) {
+        return null;
+      }
+  
+      if (lobbyData.playerCount < 2) {
+        const currentUser = db.auth().currentUser;
+        const uid = currentUser.uid;
+        dispatch(fetchUsername(uid));
+  
+        const usernameSnapshot = await get(ref(db, 'users'));
+        const username = usernameSnapshot.child(uid).val();
+  
+        lobbyData.playerCount += 1;
+        lobbyData[`player${lobbyData.playerCount}`] = {
+          uid,
+          username,
+        };
+  
+        if (lobbyData.playerCount === 1) {
+          lobbyData.player1 = {
+            uid,
+            username,
+          };
+        } else if (lobbyData.playerCount === 2) {
+          lobbyData.player2 = {
+            uid,
+            username,
+          };
+        }
+  
+        if (lobbyData.playerCount === 2) {
+          lobbyData.gameData = {
+            blocks: Array.from({ length: 6 }, () => Array(7).fill(null)),
+            playerTurn: 1,
+            isGameDone: false,
+            turnNumber: 1,
+          };
+        }
+  
+        await update(lobbyRef, lobbyData);
+      }
+    } catch (error) {
+      console.error('Error joining the game:', error);
+    }
+  };
+  
 
   const gameData = {
     board: [], // Array of 42 tiles initialized with null values
@@ -38,8 +97,9 @@ const Connect4Board = ({ board: initialBoard = []}) => {
     turnNumber: 1,
   };
 
-  const handleColumnClick = ( colIndex, gameData) => {
-    if (isGameDone) return;
+
+  const handleColumnClick = (colIndex) => {
+    if (isGameDone || currentPlayer !== 1) return;
   
     const updatedBoard = [...board];
     let isMoveMade = false;
@@ -56,36 +116,42 @@ const Connect4Board = ({ board: initialBoard = []}) => {
   
     if (!isMoveMade) return;
   
-    setBoard(updatedBoard);
-  
-
     const newMove = {
       player: currentPlayer,
       block: row * 7 + colIndex,
     };
 
-    const gameDataRef = ref(realtime, `lobbies/${lobbyId}/gamedata`);
-    set(gameDataRef, newMove);
+    const updatedBlocks = {
+      ...(gameData.blocks || {}),
+      [row]: {
+        ...(gameData.blocks?.[row] || {}),
+        [colIndex]: currentPlayer,
+      },
+    };
   
-
+    const gameDataRef = ref(realtime, `lobbies/${lobbyId}/gameData`);
+    set(gameDataRef, {
+      ...gameData,
+      turnNumber: gameData.turnNumber + 1,
+      playerTurn: currentPlayer === 1 ? 2 : 1,
+      blocks: updatedBlocks,
+    });
   
     if (checkForDraw(updatedBoard)) {
       setIsGameDone(true);
       return;
     }
-
-    if (checkForWin(updatedBoard, row, colIndex)) {
+  
+    if (checkForWin(updatedBoard, currentPlayer)) {
       setIsGameDone(true);
       return;
     }
 
-    const clickedBlock = document.getElementById(`block-${row}-${colIndex}`);
-  if (clickedBlock && clickedBlock.classList) {
-    clickedBlock.classList.add(`block`, `player-${currentPlayer}`);
-  }
   
-    setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
+
+    setCurrentPlayer(2);
   };
+  
   
 
   const checkForWin = (board, player) => {
@@ -168,11 +234,51 @@ const Connect4Board = ({ board: initialBoard = []}) => {
     }
   }, [isOpponentJoined, currentPlayer]);
 
+  
+
   useEffect(() => {
     if (currentPlayer === 1 && isOpponentJoined) {
       setIsGameDone(false);
     }
   }, [currentPlayer, isOpponentJoined]);
+
+  const handlePlayerTurn = (player) => {
+    const gameDataRef = ref(realtime, `lobbies/${lobbyId}/gameData`);
+    onValue(gameDataRef, (snapshot) => {
+      const gameData = snapshot.val();
+      const { isGameDone, playerTurn } = gameData;
+
+      if (isGameDone) {
+        // Game is already done
+        return;
+      }
+     
+
+      if (player === playerTurn) {
+        // It's this player's turn, allow move
+        setLoading(false); // Disable loading state
+        handleColumnClick(player);
+      } else {
+        // It's not this player's turn yet, wait for update
+        setLoading(true); // Enable loading state
+      }
+
+      setBoard(board);
+      setIsGameDone(checkForWin(board, playerTurn) || checkForDraw(board));
+      setLoading(playerTurn !== currentPlayer);
+      setCurrentPlayer(playerTurn);
+
+    });
+  };
+
+  
+
+  useEffect(() => {
+    if (currentPlayer === 1 && isOpponentJoined) {
+      setIsGameDone(false);
+    }
+  }, [currentPlayer, isOpponentJoined]);
+
 
   return (
     <>

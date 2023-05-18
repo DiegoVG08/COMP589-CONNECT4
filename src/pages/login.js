@@ -8,6 +8,8 @@ import {
   query,
   where,
   getDocs,
+  setDoc,
+  doc
 } from "firebase/firestore";
 import {
   getAuth,
@@ -61,7 +63,7 @@ const Registration = () => {
         uid: user.uid,
         password: hashedPassword,
       };
-      await addDoc(usersRef, userData);
+      await setDoc(doc(usersRef, user.uid), userData);
 
       // Navigate to login screen after successful registration
       navigate("/Home");

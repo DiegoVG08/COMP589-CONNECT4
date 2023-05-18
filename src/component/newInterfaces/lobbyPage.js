@@ -1,8 +1,13 @@
-import { getDatabase, onValue, ref, push, child, set, once, get, runTransaction } from "firebase/database";
+import { getDatabase, onValue, ref, push, child, set, once, get, runTransaction, collection } from "firebase/database";
 import React, { useState, useEffect } from 'react';
-import { db, realtime } from '../Firebase';
+import { db, realtime, auth } from '../Firebase';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { useFirebase, isLoaded, isEmpty } from 'react-redux-firebase';
+import { fetchUsername  } from '../../reducers/userActions';
+
+
 
 const LobbyPage = () => {
   const [lobbyId, setLobbyId] = useState('');
@@ -14,6 +19,8 @@ const LobbyPage = () => {
 
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
 
   const generateLobbyId = () => {
     const lobbiesRef = ref(realtime, "lobbies");
@@ -64,31 +71,40 @@ const LobbyPage = () => {
 
   const handleJoinLobby = (event) => {
     event.preventDefault();
-
+  
     // Join the lobby using the provided lobby ID
     const lobbyRef = ref(realtime, `lobbies/${lobbyId}`);
-
+  
     // Check if the lobby exists
     get(lobbyRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
-          // Lobby exists, join the lobby
-          const playerCountRef = child(lobbyRef, "playerCount");
-          runTransaction(playerCountRef, (currentCount) => {
-            return (currentCount || 0) + 1;
-          })
-            .then((transactionResult) => {
-              if (transactionResult.committed) {
-                const updatedCount = transactionResult.snapshot.val();
-                setPlayerCount(updatedCount);
-
-                // Redirect to the game screen
-                navigate(`/Game/${lobbyId}`);
-              }
-            })
-            .catch((error) => {
-              console.error("Error updating player count:", error);
-            });
+          const lobbyData = snapshot.val();
+          const playerCount = lobbyData.playerCount || 0;
+          
+          if (playerCount < 2) {
+            // Increment the player count and assign the player
+            const assignedPlayer = playerCount === 0 ? 'player1' : 'player2';
+            const playerRef = child(lobbyRef, `players/${assignedPlayer}`);
+            set(playerRef, playerId)
+              .then(() => {
+                // Increment the player count
+                const playerCountRef = child(lobbyRef, 'playerCount');
+                set(playerCountRef, playerCount + 1)
+                  .then(() => {
+                    // Redirect to the game screen
+                    navigate(`/Game/${lobbyId}`);
+                  })
+                  .catch((error) => {
+                    console.error("Error updating player count:", error);
+                  });
+              })
+              .catch((error) => {
+                console.error("Error assigning player:", error);
+              });
+          } else {
+            console.log("Lobby is full");
+          }
         } else {
           console.log("Lobby not found");
         }
@@ -97,7 +113,6 @@ const LobbyPage = () => {
         console.error("Error reading lobby data:", error);
       });
   };
-  
   
 
   const joinLobby = (lobbyId) => {

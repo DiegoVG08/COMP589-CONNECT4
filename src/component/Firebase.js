@@ -19,7 +19,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const realtime = getDatabase(app);
 
-export { auth, db, app, realtime };
+export { auth, db, app, realtime, firebaseConfig };
 
 
 

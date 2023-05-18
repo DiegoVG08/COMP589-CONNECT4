@@ -9,29 +9,66 @@ import Connect4Board from "./component/newInterfaces/board";
 import LobbyPage from "./component/newInterfaces/lobbyPage";
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
-
-
-
+import { useDispatch, useSelector, Provider } from 'react-redux';
+import { logIn, logOut, setUser, clearUser } from './reducers/actions';
+import store from './store';
+import { auth, db } from './component/Firebase';
 
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState({}); // Define user state variable
-  console.log(user);
   const [lobbyId, setLobbyId] = useState(null); 
+  const isLoggedIn = useSelector((state) => state.isLoggedIn);
+  const user = useSelector((state) => state.user);
 
-  const updateUser = (newUser) => setUser(newUser);
-  const handleLogin = () => {
-    setIsLoggedIn(true);
+  const dispatch = useDispatch();
+
+  const updateUser = (newUser) => {
+    // Get the current user from Firebase authentication
+    const currentUser = auth.currentUser;
+  
+    if (currentUser) {
+      // Update the user data in Firestore
+      db.collection('users').doc(currentUser.uid).update(newUser)
+        .then(() => {
+          // Dispatch setUser action with the updated user data
+          dispatch(setUser(newUser));
+        })
+        .catch((error) => {
+          // Handle update error
+        });
+    }
+  };
+
+  const handleLogin = (email, password) => {
+    // Implement Firebase login logic
+    auth.signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        // Dispatch LOG_IN action with the user data
+        const user = userCredential.user;
+        dispatch(logIn(user));
+      })
+      .catch((error) => {
+        // Handle login error
+      });
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    // Implement Firebase logout logic
+    auth.signOut()
+      .then(() => {
+        // Dispatch LOG_OUT action
+        dispatch(logOut());
+      })
+      .catch((error) => {
+        // Handle logout error
+        console.log('Logout error:', error);
+      });
   };
-
+  
 
 
   return (
+    <Provider store={store}>
     <Router>
       <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} user={user}/>
       <Routes>
@@ -46,6 +83,7 @@ function App() {
         <Route path='/Account' element={<AccountPage user={user} updateUser={updateUser} />} />
       </Routes>
     </Router>
+    </Provider>
   );
   
 }
