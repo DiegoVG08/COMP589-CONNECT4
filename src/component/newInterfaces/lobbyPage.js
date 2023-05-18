@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useFirebase, isLoaded, isEmpty } from 'react-redux-firebase';
 import { fetchUsername  } from '../../reducers/userActions';
+import { getFirestore, doc, updateDoc, getDoc } from 'firebase/firestore';
+
 
 
 
@@ -69,7 +71,7 @@ const LobbyPage = () => {
       });
   };
 
-  const handleJoinLobby = (event) => {
+  const handleJoinLobby = async (event) => {
     event.preventDefault();
   
     // Join the lobby using the provided lobby ID
@@ -77,30 +79,46 @@ const LobbyPage = () => {
   
     // Check if the lobby exists
     get(lobbyRef)
-      .then((snapshot) => {
+      .then(async (snapshot) => {
         if (snapshot.exists()) {
           const lobbyData = snapshot.val();
           const playerCount = lobbyData.playerCount || 0;
-          
+  
           if (playerCount < 2) {
-            // Increment the player count and assign the player
             const assignedPlayer = playerCount === 0 ? 'player1' : 'player2';
-            const playerRef = child(lobbyRef, `players/${assignedPlayer}`);
-            set(playerRef, playerId)
-              .then(() => {
-                // Increment the player count
-                const playerCountRef = child(lobbyRef, 'playerCount');
-                set(playerCountRef, playerCount + 1)
-                  .then(() => {
-                    // Redirect to the game screen
-                    navigate(`/Game/${lobbyId}`);
-                  })
-                  .catch((error) => {
-                    console.error("Error updating player count:", error);
-                  });
+  
+            // Fetch the username using Firebase Authentication and Firestore
+            const currentUser = auth.currentUser;
+            const uid = currentUser.uid;
+            const userDocRef = doc(db, 'users', uid);
+  
+            getDoc(userDocRef)
+              .then((doc) => {
+                if (doc.exists()) {
+                  const username = doc.data().username;
+  
+                  // Assign the username to the corresponding player
+                  lobbyData.playerCount += 1;
+                  lobbyData[assignedPlayer] = {
+                    uid,
+                    username,
+                  };
+  
+                  // Update the lobby data in Firebase
+                  set(lobbyRef, lobbyData)
+                    .then(() => {
+                      // Redirect to the game screen
+                      navigate(`/Game/${lobbyId}`);
+                    })
+                    .catch((error) => {
+                      console.error("Error joining lobby:", error);
+                    });
+                } else {
+                  console.log("User document not found");
+                }
               })
               .catch((error) => {
-                console.error("Error assigning player:", error);
+                console.error("Error fetching user document:", error);
               });
           } else {
             console.log("Lobby is full");
@@ -113,6 +131,7 @@ const LobbyPage = () => {
         console.error("Error reading lobby data:", error);
       });
   };
+  
   
 
   const joinLobby = (lobbyId) => {
