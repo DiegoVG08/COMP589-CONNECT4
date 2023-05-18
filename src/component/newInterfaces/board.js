@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ref, onValue, set, off } from 'firebase/database';
 import { realtime } from '../Firebase';
-import { Block, Container, Row } from './styling';
+import { Block, Container, Row, BoardContainer } from './styling';
 
 
 const Tile = ({ value, onClick }) => {
@@ -162,6 +162,7 @@ const Connect4Board = ({ board: initialBoard = [], onColumnClick }) => {
     ) : (
       <h2>Player {currentPlayer}'s turn</h2>
     )}
+    <BoardContainer>
     <Container>
       <Row>
         <Block onClick={() => handleColumnClick(0)}>{board[0]}</Block>
@@ -218,6 +219,7 @@ const Connect4Board = ({ board: initialBoard = [], onColumnClick }) => {
         <Block onClick={() => handleColumnClick(41)}>{board[41]}</Block>
       </Row>
       </Container>
+      </BoardContainer>
       {isGameDone && (
         <p>{checkForDraw(board) ? 'The game is a draw!' : `Player ${currentPlayer} wins!`}</p>
       )}

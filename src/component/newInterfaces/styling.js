@@ -10,10 +10,31 @@ export const Block = styled.div`
   height: 70px;
   justify-content: center;
   width: 70px;
-
+  
+  & > div {
+    border-radius: 50%;
+    height: 60px;
+    width: 60px;
+  }
+  
+  &.player-1 > div {
+    background-color: red;
+  }
+  
+  &.player-2 > div {
+    background-color: yellow;
+  }
+  
   &:hover {
     background-color: lightblue;
   }
+`;
+
+
+export const BoardContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const Container = styled.div`
@@ -25,6 +46,7 @@ export const Container = styled.div`
     ${({ marking }) => marking && 'background-color: lightgray;'}
   }
 `;
+
 
 export const Row = styled.div`
   display: flex;
