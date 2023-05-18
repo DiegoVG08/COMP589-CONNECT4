@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 
 
 export const Block = styled.div`
+  position: relative;
   align-items: center;
   border: solid 1px black;
   cursor: pointer;
@@ -10,25 +11,41 @@ export const Block = styled.div`
   height: 70px;
   justify-content: center;
   width: 70px;
-  
-  & > div {
+  background-color: black;
+
+  &:hover {
+    &::before {
+      background-color: lightblue;
+    }
+  }
+
+  &::before {
+    content: '';
+    background-color: white;
     border-radius: 50%;
     height: 60px;
     width: 60px;
   }
-  
-  &.player-1 > div {
+
+  &::after {
+    content: '';
+    position: absolute;
+    background-color: transparent;
+    border-radius: 50%;
+    height: 60px;
+    width: 60px;
+    pointer-events: none;
+  }
+
+  &.player-1::after {
     background-color: red;
   }
-  
-  &.player-2 > div {
+
+  &.player-2::after {
     background-color: yellow;
   }
-  
-  &:hover {
-    background-color: lightblue;
-  }
 `;
+
 
 
 export const BoardContainer = styled.div`
@@ -51,3 +68,5 @@ export const Container = styled.div`
 export const Row = styled.div`
   display: flex;
 `;
+
+

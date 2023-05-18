@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { ref, onValue, set, off } from 'firebase/database';
 import { realtime } from '../Firebase';
 import { Block, Container, Row, BoardContainer } from './styling';
+import './board.css'
 
 
 const Tile = ({ value, onClick }) => {
@@ -15,7 +16,7 @@ const Tile = ({ value, onClick }) => {
 };
 
 
-const Connect4Board = ({ board: initialBoard = [], onColumnClick }) => {
+const Connect4Board = ({ board: initialBoard = [], onColumnClick, gamedata }) => {
   const [board, setBoard] = useState(() =>
   Array.from({ length: 6 }, () => Array(7).fill(null))
 );
@@ -23,6 +24,7 @@ const Connect4Board = ({ board: initialBoard = [], onColumnClick }) => {
   const [isGameDone, setIsGameDone] = useState(false);
   const [isOpponentJoined, setIsOpponentJoined] = useState(false);
   const { lobbyId } = useParams();
+  
 
   useEffect(() => {
     const lobbyRef = ref(realtime, `lobbies/${lobbyId}`);
@@ -41,34 +43,53 @@ const Connect4Board = ({ board: initialBoard = [], onColumnClick }) => {
 
   const handleColumnClick = (colIndex) => {
     if (isGameDone) return;
-
+  
     const updatedBoard = [...board];
     let isMoveMade = false;
-
-    for (let row = 5; row >= 0; row--) {
-      if (updatedBoard[row][colIndex] === null) {
-        updatedBoard[row][colIndex] = currentPlayer;
+    let row;
+  
+    for (let r = 5; r >= 0; r--) {
+      if (updatedBoard[r][colIndex] === null) {
+        updatedBoard[r][colIndex] = currentPlayer;
+        row = r; // Keep track of the row index
         isMoveMade = true;
         break;
       }
     }
-
+  
     if (!isMoveMade) return;
-
+  
     setBoard(updatedBoard);
-
+  
+    const gameDataRef = ref(realtime, `lobbies/${lobbyId}/gamedata`);
+    const newMove = {
+      player: currentPlayer,
+      block: row * 7 + colIndex, // Calculate the specific block index
+    };
+  
+    const updatedGameData = {
+      ...gamedata,
+      board: [...gamedata.board, newMove],
+    };
+  
+    set(gameDataRef, updatedGameData); // Update game data on Firebase
+  
     if (checkForWin(currentPlayer)) {
       setIsGameDone(true);
       return;
     }
-
+  
     if (checkForDraw(updatedBoard)) {
       setIsGameDone(true);
       return;
     }
 
+    const clickedBlock = document.getElementById(`block-${row}-${colIndex}`);
+    clickedBlock.classList.toggle(`player-${currentPlayer}`);
+  
     setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
   };
+  
 
   const checkForWin = (player) => {
     // Check horizontal
@@ -157,66 +178,70 @@ const Connect4Board = ({ board: initialBoard = [], onColumnClick }) => {
   return (
     <>
     <h1>Lobby ID: {lobbyId}</h1>
-    {!isOpponentJoined ? (
-      <h2>Waiting for opponent...</h2>
-    ) : (
-      <h2>Player {currentPlayer}'s turn</h2>
-    )}
+    <div className="status-container">
+  {!isOpponentJoined ? (
+    <h2 className="status-message">Waiting for opponent...</h2>
+  ) : (
+    <h2 className="status-message">Player {currentPlayer}'s turn</h2>
+  )}
+</div>
+
     <BoardContainer>
     <Container>
-      <Row>
-        <Block onClick={() => handleColumnClick(0)}>{board[0]}</Block>
-        <Block onClick={() => handleColumnClick(1)}>{board[1]}</Block>
-        <Block onClick={() => handleColumnClick(2)}>{board[2]}</Block>
-        <Block onClick={() => handleColumnClick(3)}>{board[3]}</Block>
-        <Block onClick={() => handleColumnClick(4)}>{board[4]}</Block>
-        <Block onClick={() => handleColumnClick(5)}>{board[5]}</Block>
-        <Block onClick={() => handleColumnClick(6)}>{board[6]}</Block>
+    <Row>
+    <Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(0)} className={`player-${board[0]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(1)} className={`player-${board[1]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(2)} className={`player-${board[2]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(3)} className={`player-${board[3]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(4)} className={`player-${board[4]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(5)} className={`player-${board[5]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(6)} className={`player-${board[6]}`}></Block>
       </Row>
       <Row>
-        <Block onClick={() => handleColumnClick(7)}>{board[7]}</Block>
-        <Block onClick={() => handleColumnClick(8)}>{board[8]}</Block>
-        <Block onClick={() => handleColumnClick(9)}>{board[9]}</Block>
-        <Block onClick={() => handleColumnClick(10)}>{board[10]}</Block>
-        <Block onClick={() => handleColumnClick(11)}>{board[11]}</Block>
-        <Block onClick={() => handleColumnClick(12)}>{board[12]}</Block>
-        <Block onClick={() => handleColumnClick(13)}>{board[13]}</Block>
+      <Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(7)} className={`player-${board[7]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(8)} className={`player-${board[8]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(9)} className={`player-${board[9]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(10)} className={`player-${board[10]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(11)} className={`player-${board[11]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(12)} className={`player-${board[12]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(13)} className={`player-${board[13]}`}></Block>
       </Row>
       <Row>
-        <Block onClick={() => handleColumnClick(14)}>{board[14]}</Block>
-        <Block onClick={() => handleColumnClick(15)}>{board[15]}</Block>
-        <Block onClick={() => handleColumnClick(16)}>{board[16]}</Block>
-        <Block onClick={() => handleColumnClick(17)}>{board[17]}</Block>
-        <Block onClick={() => handleColumnClick(18)}>{board[18]}</Block>
-        <Block onClick={() => handleColumnClick(19)}>{board[19]}</Block>
-        <Block onClick={() => handleColumnClick(20)}>{board[20]}</Block>
+      <Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(14)} className={`player-${board[14]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(15)} className={`player-${board[15]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(16)} className={`player-${board[16]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(17)} className={`player-${board[17]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(18)} className={`player-${board[18]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(19)} className={`player-${board[19]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(20)} className={`player-${board[20]}`}></Block>
       </Row>
       <Row>
-        <Block onClick={() => handleColumnClick(21)}>{board[21]}</Block>
-        <Block onClick={() => handleColumnClick(22)}>{board[22]}</Block>
-        <Block onClick={() => handleColumnClick(23)}>{board[23]}</Block>
-        <Block onClick={() => handleColumnClick(24)}>{board[24]}</Block>
-        <Block onClick={() => handleColumnClick(25)}>{board[25]}</Block>
-        <Block onClick={() => handleColumnClick(26)}>{board[26]}</Block>
-        <Block onClick={() => handleColumnClick(27)}>{board[27]}</Block>
+      <Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(21)} className={`player-${board[21]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(22)} className={`player-${board[22]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(23)} className={`player-${board[23]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(24)} className={`player-${board[24]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(25)} className={`player-${board[25]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(26)} className={`player-${board[26]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(27)} className={`player-${board[27]}`}></Block>
       </Row>
       <Row>
-        <Block onClick={() => handleColumnClick(28)}>{board[28]}</Block>
-        <Block onClick={() => handleColumnClick(29)}>{board[29]}</Block>
-        <Block onClick={() => handleColumnClick(30)}>{board[30]}</Block>
-        <Block onClick={() => handleColumnClick(31)}>{board[31]}</Block>
-        <Block onClick={() => handleColumnClick(32)}>{board[32]}</Block>
-        <Block onClick={() => handleColumnClick(33)}>{board[33]}</Block>
-        <Block onClick={() => handleColumnClick(34)}>{board[34]}</Block>
+      <Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(28)} className={`player-${board[28]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(29)} className={`player-${board[29]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(30)} className={`player-${board[30]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(31)} className={`player-${board[31]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(32)} className={`player-${board[32]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(33)} className={`player-${board[33]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(34)} className={`player-${board[34]}`}></Block>
+
       </Row>
       <Row>
-        <Block onClick={() => handleColumnClick(35)}>{board[35]}</Block>
-        <Block onClick={() => handleColumnClick(36)}>{board[36]}</Block>
-        <Block onClick={() => handleColumnClick(37)}>{board[37]}</Block>
-        <Block onClick={() => handleColumnClick(38)}>{board[38]}</Block>
-        <Block onClick={() => handleColumnClick(39)}>{board[39]}</Block>
-        <Block onClick={() => handleColumnClick(40)}>{board[40]}</Block>
-        <Block onClick={() => handleColumnClick(41)}>{board[41]}</Block>
+      <Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(35)} className={`player-${board[35]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(36)} className={`player-${board[36]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(37)} className={`player-${board[37]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(38)} className={`player-${board[38]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(39)} className={`player-${board[39]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(40)} className={`player-${board[40]}`}></Block>
+<Block currentPlayer={currentPlayer} onClick={() => handleColumnClick(41)} className={`player-${board[41]}`}></Block>
       </Row>
       </Container>
       </BoardContainer>
