@@ -1,4 +1,4 @@
-import { getDatabase, ref, push, child, set} from "firebase/database";
+import { getDatabase, onValue, ref, push, child, set, once, get} from "firebase/database";
 import React, { useState } from 'react';
 import { db, realtime } from '../Firebase';
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -66,7 +66,7 @@ const writeLobbyData = (lobbyId) => {
     const lobbyRef = ref(realtime, `lobbies/${lobbyId}`);
   
     // Check if the lobby exists
-    lobbyRef.once('value', (snapshot) => {
+    get(lobbyRef).then((snapshot) => {
       if (snapshot.exists()) {
         // Lobby exists, join the lobby
         joinLobby(lobbyId);
@@ -75,16 +75,19 @@ const writeLobbyData = (lobbyId) => {
         // Lobby does not exist, show an error message or handle it appropriately
         console.log("Lobby not found");
       }
+    }).catch((error) => {
+      // Handle any errors that occurred during the read operation
+      console.error("Error reading lobby data:", error);
     });
   };
   
 
   const joinLobby = (lobbyId) => {
-    const lobbyRef = ref( realtime, `lobbies/${lobbyId}`);
-
-    lobbyRef.on('value', (snapshot) => {
+    const lobbyRef = ref(realtime, `lobbies/${lobbyId}`);
+  
+    onValue(lobbyRef, (snapshot) => {
       const lobbyData = snapshot.val();
-
+     
       if (lobbyData) {
         // Update the game state based on the lobby data
         const updatedGameState = {
@@ -93,9 +96,9 @@ const writeLobbyData = (lobbyId) => {
           playerTurn: lobbyData.gameData.playerTurn,
           turnNumber: lobbyData.gameData.turnNumber,
         };
-
+        console.log(`Joining lobby with ID: ${lobbyId}`);
         // Perform additional game logic as needed
-
+  
         // Set the updated game state
         setGameState(updatedGameState);
       }
