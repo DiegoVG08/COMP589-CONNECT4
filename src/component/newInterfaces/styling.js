@@ -1,6 +1,5 @@
-import React from 'react';
-import styled, { css } from 'styled-components';
-
+import React, { useState } from "react";
+import styled from "styled-components";
 
 export const Block = styled.div`
   position: relative;
@@ -20,15 +19,15 @@ export const Block = styled.div`
   }
 
   &::before {
-    content: '';
-    background-color: white;
+    content: "";
+    background-color: ${({ clicked }) => (clicked ? "lightgray" : "white")};
     border-radius: 50%;
     height: 60px;
     width: 60px;
   }
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     background-color: transparent;
     border-radius: 50%;
@@ -46,8 +45,6 @@ export const Block = styled.div`
   }
 `;
 
-
-
 export const BoardContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -55,18 +52,15 @@ export const BoardContainer = styled.div`
 `;
 
 export const Container = styled.div`
-  ${({ marking }) => marking && 'background-color: lightgray;'}
+  ${({ marking }) => marking && "background-color: lightgray;"}
   border: solid 1px black;
   margin-bottom: 30px;
 
   & > div > div {
-    ${({ marking }) => marking && 'background-color: lightgray;'}
+    ${({ marking }) => marking && "background-color: lightgray;"}
   }
 `;
-
 
 export const Row = styled.div`
   display: flex;
 `;
-
-
